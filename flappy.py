@@ -25,6 +25,7 @@ big_font = pygame.font.SysFont("comicsans", 32)
 high_score = 0
 game_active = False
 
+
 class Bird:
     def __init__(self, x, y, radius):
         self.x = x
@@ -52,7 +53,9 @@ class Bird:
             print("KURŁA JEBŁEM W SUFIT!")
 
     def draw(self, screen, color):
-        pygame.draw.circle(screen, color, (int(self.x), int(self.y)), self.radius)
+        pygame.draw.circle(
+            screen, color, (int(self.x), int(self.y)), self.radius)
+
 
 class Coin:
     def __init__(self, x, y, radius=8):
@@ -63,7 +66,8 @@ class Coin:
 
     def draw(self, screen):
         if not self.collected:
-            pygame.draw.circle(screen, (255, 215, 0), (int(self.x), int(self.y)), self.radius)
+            pygame.draw.circle(screen, (255, 215, 0),
+                               (int(self.x), int(self.y)), self.radius)
 
     def check_collision(self, bird):
         distance = ((self.x - bird.x) ** 2 + (self.y - bird.y) ** 2) ** 0.5
@@ -71,6 +75,7 @@ class Coin:
             self.collected = True
             return True
         return False
+
 
 class Pipe:
     def __init__(self, x, width, gap_height, speed):
@@ -81,7 +86,8 @@ class Pipe:
         self.gap_y = random.randint(100, HEIGHT - floor_height - 100)
         self.scored = False
 
-        coin_y = random.randint(self.gap_y + 10, self.gap_y + self.gap_height - 10)
+        coin_y = random.randint(
+            self.gap_y + 10, self.gap_y + self.gap_height - 10)
         self.coin = Coin(self.x + self.width // 2, coin_y)
 
     def update(self):
@@ -91,7 +97,8 @@ class Pipe:
             self.x = WIDTH
             self.gap_y = random.randint(100, HEIGHT - floor_height - 100)
             self.scored = False
-            coin_y = random.randint(self.gap_y + 10, self.gap_y + self.gap_height - 10)
+            coin_y = random.randint(
+                self.gap_y + 10, self.gap_y + self.gap_height - 10)
             self.coin = Coin(self.x + self.width // 2, coin_y)
 
         self.coin.x = self.x + self.width // 2
@@ -124,6 +131,7 @@ class Pipe:
 
         return "clear"
 
+
 def draw_start_menu():
     screen.fill(WHITE)
     title = big_font.render("FLAPPY JANUSZ", True, BLUE)
@@ -134,6 +142,7 @@ def draw_start_menu():
     screen.blit(hs, (WIDTH // 2 - hs.get_width() // 2, 300))
     pygame.display.update()
 
+
 def draw_game_over(score):
     screen.fill(WHITE)
     msg = big_font.render("JANUSZ JEBNĄŁ W RURĘ!", True, (200, 0, 0))
@@ -141,6 +150,7 @@ def draw_game_over(score):
     screen.blit(msg, (WIDTH // 2 - msg.get_width() // 2, 200))
     screen.blit(wynik, (WIDTH // 2 - wynik.get_width() // 2, 250))
     pygame.display.update()
+
 
 # === POCZĄTKOWY STAN ===
 bird = Bird(50, HEIGHT // 2, 15)
@@ -199,7 +209,8 @@ while running:
     bird.draw(screen, BLUE)
     pipe.draw(screen)
     pipe.coin.draw(screen)
-    pygame.draw.rect(screen, (100, 100, 100), (0, floor_y, WIDTH, floor_height))
+    pygame.draw.rect(screen, (100, 100, 100),
+                     (0, floor_y, WIDTH, floor_height))
     score_text = font.render(f'WYNIK: {score}', True, BLUE)
     screen.blit(score_text, (10, 10))
     pygame.display.update()
