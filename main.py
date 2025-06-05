@@ -39,6 +39,7 @@ bird = Bird(50, settings.HEIGHT // 2, 15)
 pipe = Pipe(settings.WIDTH, 60, 150, 3)
 score = 0
 
+
 running = True
 while running:
     clock.tick(settings.FPS)
