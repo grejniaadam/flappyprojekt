@@ -31,9 +31,9 @@ class Bird:
         self.x = x
         self.y = y
         self.radius = radius
-        self.velocity = 0
-        self.gravity = 0.5
-        self.jump_strength = -10
+        self.velocity = -5
+        self.gravity = 0.3
+        self.jump_strength = -5
 
     def jump(self):
         self.velocity += self.jump_strength
