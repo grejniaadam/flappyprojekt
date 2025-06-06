@@ -1,8 +1,8 @@
 import pygame
 
 # === USTAWIENIE OKNA I GRY ===
-WIDTH = 800
-HEIGHT = 1200
+WIDTH = 400
+HEIGHT = 600
 FPS = 60
 floor_height = 50
 floor_y = HEIGHT - floor_height

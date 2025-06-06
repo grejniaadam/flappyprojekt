@@ -3,6 +3,17 @@ import random
 import settings
 
 
+class GameObject:
+    def __init__(self, x, y):
+        pass
+
+    def draw(self, scren):
+        pass
+
+    def update(self):
+        pass
+
+
 class Bird:
     def __init__(self, x, y, radius):
         self.x = x
@@ -43,8 +54,7 @@ class Coin:
 
     def draw(self, screen):
         if not self.collected:
-            pygame.draw.circle(screen, (255, 215, 0),
-                               (int(self.x), int(self.y)), self.radius)
+            pygame.draw.circle(screen, (255, 215, 0), (int(self.x), int(self.y)), self.radius)
 
     def check_collision(self, bird):
         distance = ((self.x - bird.x) ** 2 + (self.y - bird.y) ** 2) ** 0.5
@@ -60,8 +70,7 @@ class Pipe:
         self.width = width
         self.gap_height = gap_height
         self.speed = speed
-        self.gap_y = random.randint(
-            100, settings.HEIGHT - settings.floor_height - 100)
+        self.gap_y = random.randint(100, settings.HEIGHT - settings.floor_height - 100)
         self.scored = False
 
         coin_y = random.randint(
@@ -83,11 +92,10 @@ class Pipe:
         self.coin.x = self.x + self.width // 2
 
     def draw(self, screen):
-        pygame.draw.rect(screen, settings.GREEN,
-                         (self.x, 0, self.width, self.gap_y))
-        pygame.draw.rect(screen, settings.GREEN, (
-            self.x, self.gap_y + self.gap_height,
-            self.width, settings.HEIGHT - self.gap_y - self.gap_height - settings.floor_height))
+        pygame.draw.rect(screen, settings.GREEN, (self.x, 0, self.width, self.gap_y))
+        pygame.draw.rect(screen, settings.GREEN, (self.x, self.gap_y + self.gap_height, 
+                                                  self.width, 
+                                                  settings.HEIGHT - self.gap_y - self.gap_height - settings.floor_height))
 
     def check_collision(self, bird):
         bird_top = bird.y - bird.radius

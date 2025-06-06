@@ -1,102 +1,96 @@
 import pygame
-import sys
+
 import time
 import settings
 from game_objects import Bird, Pipe
-pygame.init()
 
 
-screen = pygame.display.set_mode((settings.WIDTH, settings.HEIGHT))
-clock = pygame.time.Clock()
-pygame.display.set_caption('Flappy Janusz')
+# Klasa Game - główna klasa
+class Game:
+    def __init__(self):
+        # Inicjalizacja pygame i okna
+        pygame.init()
+        self.screen = pygame.display.set_mode((settings.WIDTH, settings.HEIGHT))
+        self.clock = pygame.time.Clock()
+        pygame.display.set_caption("Flappy Janusz")
 
-high_score = 0
-game_active = False
+        # Inicjalizacja stnu gry
+        self.game_active = False
+        self.high_score = 0
+        self.score = 0  
+
+        self.title = settings.big_font.render("FLAPPY JANUSZ", True, settings.BLUE)
+        self.start_game_title = settings.font.render("SPACAJA = START", True, settings.BLUE)
+
+        # Tworzenie obiektów
+        self.bird = Bird(50, settings.HEIGHT // 2, 15)
+        self.pipe = Pipe(settings.WIDTH, 60, 150, 3)
+
+    def draw_start_menu(self):
+        self.screen.fill((settings.WHITE))
+        highScore = settings.font.render(f"REKORD: {self.high_score}", True, (0, 0, 0))
+        self.screen.blit(self.title, (settings.WIDTH // 2 - self.title.get_width() // 2, 150))
+        self.screen.blit(self.start_game_title, (settings.WIDTH // 2 - self.start_game_title.get_width() // 2, 300))
+        self.screen.blit(highScore, (settings.WIDTH // 2 - highScore.get_width // 2, 400))
+        pygame.display.update()
+
+    def draw_game_over(self):
+        self.screen.fill((settings.WHITE))
+        msg_if_bird_dead = settings.big_font.render("JANUSZ JEBNĄŁ W RURĘ!", True, (200, 0, 0))
+        end_score = settings.font.render(f"WYNIK: {self.score}", True, (0, 0, 0))
+        self.screen.blit(msg_if_bird_dead, (settings.WIDTH // 2 - self.get_width() // 2, 150))
+        self.screen.blit(end_score, (settings.WIDTH // 2 - self.title.get_width() // 2, 300))
+        pygame.display.update()
+
+    def run(self):
+        running = True
+        while True:
+            self.clock.tick(settings.FPS)
+
+            if not self.game_active:
+                self.draw_start_menu
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_SPACE:
+                        self.bird.jump()
+
+            self.bird.update(settings.floor_y)
+            self.pipe.update()
+            collision = self.pipe.check_collision(self.bird)
+
+            if self.pipe.coin.check_collision(self.bird):
+                self.score += 1
+                print("💰 MONETA ZEBRANA! +1 punkt")
+
+            if not self.pipe.scored and self.pipe.x + self.pipe.width < self.bird.x:
+                self.score += 1
+                self.pipe.scored = True
+
+            if collision == "hit":
+                print("💀 JANUSZ WJEBANY W RURĘ – GAME OVER")
+                if self.score > self.high_score:
+                    self.high_score = self.fscore
+                self._draw_game_over(self.score)
+                time.sleep(2)
+                self.game_active = False
+                continue
+
+            elif collision == "bounce":
+                print("🟡 JANUSZ OTARŁ SIĘ O RURĘ – ODBICIE")
+                self.bird.velocity = -self.bird.velocity * 0.5
+
+            self.screen.fill(settings.WHITE)
+            self.bird.draw(self.screen, settings.BLUE)
+            self.pipe.draw(self.screen)
+            self.pipe.coin.draw(self.screen)
+            pygame.draw.rect(self.screen, (100, 100, 100), (0, settings.floor_y, settings.WIDTH, settings.floor_height))
+            score_text = settings.font.render(f"WYNIK: {self.score}", True, settings.BLUE)
+            self.screen.blit(score_text, (10, 10))
+            pygame.display.update()
 
 
-def draw_start_menu():
-    screen.fill(settings.WHITE)
-    title = settings.big_font.render("FLAPPY JANUSZ", True, settings.BLUE)
-    start = settings.font.render("SPACJA = START", True, (0, 0, 0))
-    hs = settings.font.render(f"REKORD: {high_score}", True, (100, 0, 0))
-    screen.blit(title, (settings.WIDTH // 2 - title.get_width() // 2, 150))
-    screen.blit(start, (settings.WIDTH // 2 - start.get_width() // 2, 250))
-    screen.blit(hs, (settings.WIDTH // 2 - hs.get_width() // 2, 300))
-    pygame.display.update()
-
-
-def draw_game_over(score):
-    screen.fill(settings.WHITE)
-    msg = settings.big_font.render("JANUSZ JEBNĄŁ W RURĘ!", True, (200, 0, 0))
-    wynik = settings.font.render(f"WYNIK: {score}", True, (0, 0, 0))
-    screen.blit(msg, (settings.WIDTH // 2 - msg.get_width() // 2, 200))
-    screen.blit(wynik, (settings.WIDTH // 2 - wynik.get_width() // 2, 250))
-    pygame.display.update()
-
-
-# === POCZĄTKOWY STAN ===
-bird = Bird(50, settings.HEIGHT // 2, 15)
-pipe = Pipe(settings.WIDTH, 60, 150, 3)
-score = 0
-
-
-running = True
-while running:
-    clock.tick(settings.FPS)
-
-    if not game_active:
-        draw_start_menu()
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-                bird = Bird(50, settings.HEIGHT // 2, 15)
-                pipe = Pipe(settings.WIDTH, 60, 150, 3)
-                score = 0
-                game_active = True
-        continue
-
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_SPACE:
-                bird.jump()
-
-    bird.update(settings.floor_y)
-    pipe.update()
-    collision = pipe.check_collision(bird)
-
-    if pipe.coin.check_collision(bird):
-        score += 1
-        print("💰 MONETA ZEBRANA! +1 punkt")
-
-    if not pipe.scored and pipe.x + pipe.width < bird.x:
-        score += 1
-        pipe.scored = True
-
-    if collision == "hit":
-        print("💀 JANUSZ WJEBANY W RURĘ – GAME OVER")
-        if score > high_score:
-            high_score = score
-        draw_game_over(score)
-        time.sleep(2)
-        game_active = False
-        continue
-
-    elif collision == "bounce":
-        print("🟡 JANUSZ OTARŁ SIĘ O RURĘ – ODBICIE")
-        bird.velocity = -bird.velocity * 0.5
-
-    screen.fill(settings.WHITE)
-    bird.draw(screen, settings.BLUE)
-    pipe.draw(screen)
-    pipe.coin.draw(screen)
-    pygame.draw.rect(screen, (100, 100, 100),
-                     (0, settings.floor_y, settings.WIDTH, settings.floor_height))
-    score_text = settings.font.render(f'WYNIK: {score}', True, settings.BLUE)
-    screen.blit(score_text, (10, 10))
-    pygame.display.update()
-
-pygame.quit()
-sys.exit()
+game = Game()
+game.run()
