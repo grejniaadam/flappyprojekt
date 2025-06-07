@@ -1,0 +1,10 @@
+# Foldery generowane automatycznie
+__pycache__/
+build/
+dist/
+.idea/
+.vscode/
+
+# Pliki generowane
+*.spec
+*.html

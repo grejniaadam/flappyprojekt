@@ -1,5 +1,4 @@
 import pygame
-
 import time
 import settings
 from game_objects import Bird, Pipe
