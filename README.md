@@ -32,22 +32,22 @@ Projekt gry Flappy Janusz - Studia/Obiektówka
 ustawić te dane. 
 
 * Wykonujcię kolejno punkty.
-    1. Ustawienie nazwy Użytkownika: git config --global user.name "Imię i Nazwisko"
-    2. Ustawienie adresu e-mail: git config --global user.email "twój@email"
-    3. Ustawienie domyślnej nazwy gałęzi: git config --global init.defaultBranch main
+   1. Ustawienie nazwy Użytkownika: git config --global user.name "Imię i Nazwisko"
+   2. Ustawienie adresu e-mail: git config --global user.email "twój@email"
+   3. Ustawienie domyślnej nazwy gałęzi: git config --global init.defaultBranch main
 
 * Obsługa Git'a w terminalu (podstawowe rzeczy):
-    1. Pobranie repo: git clone "link"
+   1. Pobranie repo: git clone "link"
 
-    2. Dodanie repo (lokalnie): git add "nazwa_pliku" lub . wtedy doda wszystkie zmienione
+   2. Dodanie repo (lokalnie): git add "nazwa_pliku" lub . wtedy doda wszystkie zmienione
 
-    3. Dodanie commitu (opisu): git commit -m "Tutaj opis wprowadzonych zmian"
+   3. Dodanie commitu (opisu): git commit -m "Tutaj opis wprowadzonych zmian"
 
-    3. Wypchnięcie repo na GitHub: git push
+   3. Wypchnięcie repo na GitHub: git push
 
-    5. Pobranie zmian od innych programistów: git pull
+   5. Pobranie zmian od innych programistów: git pull
 
-    4. Sprawdznie plików między nami a Gitem: git status
+   4. Sprawdznie plików między nami a Gitem: git status
 
 
 
