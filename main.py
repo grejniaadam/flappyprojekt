@@ -12,15 +12,15 @@ class Game:
         pygame.init()
         self.screen = pygame.display.set_mode((settings.WIDTH, settings.HEIGHT))
         self.clock = pygame.time.Clock()
-        pygame.display.set_caption("Flappy Janusz")  
+        pygame.display.set_caption("Flappy Janusz")
 
         # Inicjalizacja stnu gry
-        self.game_active = False 
+        self.game_active = False
         self.high_score = 0
-        self.score = 0  
- 
+        self.score = 0
+
         self.title = settings.big_font.render("FLAPPY JANUSZ", True, settings.BLUE)
-        self.start_game_title = settings.font.render("SPACAJA = START", True, settings.BLUE) 
+        self.start_game_title = settings.font.render("SPACAJA = START", True, settings.BLUE)
 
         # Tworzenie obiektów
         self.bird = Bird(50, settings.HEIGHT // 2, 15)
@@ -59,35 +59,33 @@ class Game:
         """Metoda do resetowania stanu gry"""
         self.bird = Bird(50, settings.HEIGHT // 2, 15)
         self.pipe = Pipe(settings.WIDTH, 60, 150, 3)
-        
 
     def _run(self):
         running = True
         while running:
             self.clock.tick(settings.FPS)
-            
-            # for event in pygame.event.get():    
-            #     if event.type == pygame.QUIT: 
-            #         running = False 
+
+            # for event in pygame.event.get():
+            #     if event.type == pygame.QUIT:
+            #         running = False
             #     if event.type == pygame.KEYDOWN:
-            #         if event.key == pygame.K_SPACE: 
+            #         if event.key == pygame.K_SPACE:
             #             self.bird.jump()
 
             if self.game_active:
-
-                for event in pygame.event.get():    
-                    if event.type == pygame.QUIT: 
-                        running = False 
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        running = False
                     if event.type == pygame.KEYDOWN:
-                        if event.key == pygame.K_SPACE: 
+                        if event.key == pygame.K_SPACE:
                             self.bird.jump()
 
                 self.bird.update(settings.floor_y)
-                self.pipe.update() 
+                self.pipe.update()
                 collision = self.pipe.check_collision(self.bird)
 
                 if self.pipe.coin.check_collision(self.bird):
-                    self.score += 1         
+                    self.score += 1
                     print("💰 MONETA ZEBRANA! +1 punkt")
 
                 if not self.pipe.scored and self.pipe.x + self.pipe.width < self.bird.x:
@@ -111,17 +109,19 @@ class Game:
                 self.bird.draw(self.screen, settings.BLUE)
                 self.pipe.draw(self.screen)
                 self.pipe.coin.draw(self.screen)
-                pygame.draw.rect(self.screen, (100, 100, 100), (0, settings.floor_y, settings.WIDTH, settings.floor_height))
+                pygame.draw.rect(
+                    self.screen, (100, 100, 100), (0, settings.floor_y, settings.WIDTH, settings.floor_height)
+                )
                 score_text = settings.font.render(f"WYNIK: {self.score}", True, settings.BLUE)
                 self.screen.blit(score_text, (10, 10))
             else:
                 self._draw_start_menu()
                 # self._reset_game()
-                for event in pygame.event.get():    
-                    if event.type == pygame.QUIT: 
-                        running = False 
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        running = False
                     if event.type == pygame.KEYDOWN:
-                        if event.key == pygame.K_SPACE: 
+                        if event.key == pygame.K_SPACE:
                             self._reset_game()
                             self.game_active = True
                             # self.bird.jump()
