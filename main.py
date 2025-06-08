@@ -29,19 +29,30 @@ class Game:
     def _draw_start_menu(self):
         """Metoda do 'rysowania' głównego menu"""
         self.screen.fill((settings.WHITE))
+
         highScore = settings.font.render(f"REKORD: {self.high_score}", True, (0, 0, 0))
-        self.screen.blit(self.title, (settings.WIDTH // 2 - self.title.get_width() // 2, 150))
-        self.screen.blit(self.start_game_title, (settings.WIDTH // 2 - self.start_game_title.get_width() // 2, 300))
-        self.screen.blit(highScore, (settings.WIDTH // 2 - highScore.get_width() // 2, 400))
+
+        title_rect = self.title.get_rect(center=(settings.WIDTH // 2, 150))
+        start_game_rect = self.start_game_title.get_rect(center=(settings.WIDTH // 2, 300))
+        highScore_rect = highScore.get_rect(center=(settings.WIDTH // 2, 400))
+
+        self.screen.blit(self.title, title_rect)
+        self.screen.blit(self.start_game_title, start_game_rect)
+        self.screen.blit(highScore, highScore_rect)
         pygame.display.update()
 
     def _draw_game_over(self):
         """Metoda do 'rysowania' informacji po zakończeniu gry"""
         self.screen.fill((settings.WHITE))
+
         msg_if_bird_dead = settings.big_font.render("JANUSZ JEBNĄŁ W RURĘ!", True, (200, 0, 0))
         end_score = settings.font.render(f"WYNIK: {self.score}", True, (0, 0, 0))
-        self.screen.blit(msg_if_bird_dead, (settings.WIDTH // 2 - msg_if_bird_dead.get_width() // 2, 150))
-        self.screen.blit(end_score, (settings.WIDTH // 2 - end_score.get_width() // 2, 300))
+
+        msg_rect = msg_if_bird_dead.get_rect(center=(settings.WIDTH // 2, 200))
+        score_rect = end_score.get_rect(center=(settings.WIDTH // 2, 250))
+
+        self.screen.blit(msg_if_bird_dead, msg_rect)
+        self.screen.blit(end_score, score_rect)
         pygame.display.update()
 
     def _reset_game(self):
