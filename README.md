@@ -11,6 +11,7 @@ Projekt gry Flappy Janusz - Studia/Obiektówka
 # --- Jak pobrać i uruchomić projekt? --- #
 
 1. Sklonuj repozytorium z GitHub'a (w terminalu)
+   - Stwórz folder na projekt w niego wjedź: cd nazwa_pliku
    - Wpisz: git clone "https://github.com/grejniaadam/flappyprojekt.git"
 
 2. Wejdź do pliku. Stwórz  i odpal wirtualne środowisko.
