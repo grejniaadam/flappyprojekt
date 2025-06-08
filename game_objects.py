@@ -7,7 +7,7 @@ class GameObject:
     def __init__(self, x, y):
         pass
 
-    def draw(self, scren):
+    def draw(self, screen):
         pass
 
     def update(self):
