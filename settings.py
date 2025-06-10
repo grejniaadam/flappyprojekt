@@ -12,6 +12,7 @@ floor_y = HEIGHT - floor_height
 WHITE = (255, 255, 255)
 BLUE = (0, 0, 255)
 GREEN = (0, 255, 0)
+YELLOW = (255, 215, 0)
 
 
 # === CZCIONKI ===

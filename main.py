@@ -55,10 +55,12 @@ class Game:
         self.screen.blit(end_score, score_rect)
         pygame.display.update()
 
-    def _reset_game(self):
+    def _reset_game(self): 
         """Metoda do resetowania stanu gry"""
         self.bird = Bird(50, settings.HEIGHT // 2, 15)
         self.pipe = Pipe(settings.WIDTH, 60, 150, 3)
+        self.score = 0
+        
 
     def _run(self):
         running = True
@@ -85,21 +87,21 @@ class Game:
                     self.pipe.scored = True
 
                 if collision == "hit":
-                    print("💀 JANUSZ WJEBANY W RURĘ – GAME OVER")
+                    print("💀 JANUSZ WJEBANY W RURĘ – GAME OVER")   
                     if self.score > self.high_score:
                         self.high_score = self.score
                     self._draw_game_over()
                     time.sleep(2)
                     self.game_active = False
 
-                elif collision == "bounce":
-                    print("🟡 JANUSZ OTARŁ SIĘ O RURĘ – ODBICIE")
-                    self.bird.velocity = -self.bird.velocity * 0.5
+                # elif collision == "bounce":
+                #     print("🟡 JANUSZ OTARŁ SIĘ O RURĘ – ODBICIE")
+                #     self.bird.velocity = -self.bird.velocity * 0.5
 
                 self.screen.fill(settings.WHITE)
                 self.bird.draw(self.screen, settings.BLUE)
                 self.pipe.draw(self.screen)
-                self.pipe.coin.draw(self.screen)
+                self.pipe.coin.draw(self.screen, settings.YELLOW)
                 pygame.draw.rect(self.screen, (100, 100, 100), (0, settings.floor_y, settings.WIDTH, settings.floor_height))
                 score_text = settings.font.render(f"WYNIK: {self.score}", True, settings.BLUE)
                 self.screen.blit(score_text, (10, 10))

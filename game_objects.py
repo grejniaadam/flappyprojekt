@@ -4,21 +4,23 @@ import settings
 
 
 class GameObject:
-    def __init__(self, x, y):
-        pass
+    def __init__(self, x=0, y=0, radius=0, test=0):
+        self.x = x
+        self.y = y
+        self.radius = radius
+        self.test = test
 
-    def draw(self, screen):
-        pass
+
+    def draw(self, screen, color=settings.WHITE, radius=0):
+        pygame.draw.circle(screen, color, (int(self.x), int(self.y)), self.radius)
 
     def update(self):
         pass
 
 
-class Bird:
+class Bird(GameObject):
     def __init__(self, x, y, radius):
-        self.x = x
-        self.y = y
-        self.radius = radius
+        super().__init__(x, y, radius)
         self.velocity = -5
         self.gravity = 0.3
         self.jump_strength = -5
@@ -40,21 +42,20 @@ class Bird:
             self.velocity = 0
             print("KURŁA JEBŁEM W SUFIT!")
 
-    def draw(self, screen, color):
-        pygame.draw.circle(
-            screen, color, (int(self.x), int(self.y)), self.radius)
+    # def draw(self, screen, color):
+    #     super().draw(screen, color, self.radius)
+        # pygame.draw.circle(screen, color, (int(self.x), int(self.y)), self.radius)
 
 
-class Coin:
+class Coin(GameObject):
     def __init__(self, x, y, radius=8):
-        self.x = x
-        self.y = y
-        self.radius = radius
+        super().__init__(x, y, radius)
         self.collected = False
 
-    def draw(self, screen):
+    def draw(self, screen, color):
         if not self.collected:
-            pygame.draw.circle(screen, (255, 215, 0), (int(self.x), int(self.y)), self.radius)
+            super().draw(screen, color)
+            # pygame.draw.circle(screen, settings.YELLOW, (int(self.x), int(self.y)), self.radius)
 
     def check_collision(self, bird):
         distance = ((self.x - bird.x) ** 2 + (self.y - bird.y) ** 2) ** 0.5
@@ -64,9 +65,9 @@ class Coin:
         return False
 
 
-class Pipe:
+class Pipe(GameObject):
     def __init__(self, x, width, gap_height, speed):
-        self.x = x
+        super().__init__(x)
         self.width = width
         self.gap_height = gap_height
         self.speed = speed
@@ -93,8 +94,7 @@ class Pipe:
 
     def draw(self, screen):
         pygame.draw.rect(screen, settings.GREEN, (self.x, 0, self.width, self.gap_y))
-        pygame.draw.rect(screen, settings.GREEN, (self.x, self.gap_y + self.gap_height, 
-                                                  self.width, 
+        pygame.draw.rect(screen, settings.GREEN, (self.x, self.gap_y + self.gap_height, self.width, 
                                                   settings.HEIGHT - self.gap_y - self.gap_height - settings.floor_height))
 
     def check_collision(self, bird):
