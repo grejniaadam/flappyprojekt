@@ -65,13 +65,6 @@ class Game:
         while running:
             self.clock.tick(settings.FPS)
 
-            # for event in pygame.event.get():
-            #     if event.type == pygame.QUIT:
-            #         running = False
-            #     if event.type == pygame.KEYDOWN:
-            #         if event.key == pygame.K_SPACE:
-            #             self.bird.jump()
-
             if self.game_active:
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
@@ -98,8 +91,6 @@ class Game:
                     self._draw_game_over()
                     time.sleep(2)
                     self.game_active = False
-                    # running = False
-                    # continue
 
                 elif collision == "bounce":
                     print("🟡 JANUSZ OTARŁ SIĘ O RURĘ – ODBICIE")
@@ -109,14 +100,12 @@ class Game:
                 self.bird.draw(self.screen, settings.BLUE)
                 self.pipe.draw(self.screen)
                 self.pipe.coin.draw(self.screen)
-                pygame.draw.rect(
-                    self.screen, (100, 100, 100), (0, settings.floor_y, settings.WIDTH, settings.floor_height)
-                )
+                pygame.draw.rect(self.screen, (100, 100, 100), (0, settings.floor_y, settings.WIDTH, settings.floor_height))
                 score_text = settings.font.render(f"WYNIK: {self.score}", True, settings.BLUE)
                 self.screen.blit(score_text, (10, 10))
             else:
                 self._draw_start_menu()
-                # self._reset_game()
+
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
                         running = False
@@ -124,7 +113,6 @@ class Game:
                         if event.key == pygame.K_SPACE:
                             self._reset_game()
                             self.game_active = True
-                            # self.bird.jump()
             pygame.display.update()
 
 

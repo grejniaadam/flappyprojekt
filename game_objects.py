@@ -34,7 +34,7 @@ class Bird:
             self.y = floor_y - self.radius
             self.velocity = 0
             print("JANUSZ WPIERDOLIŁ SIĘ W ZIEMIĘ!")
-
+ 
         if self.y - self.radius < 0:
             self.y = self.radius
             self.velocity = 0
