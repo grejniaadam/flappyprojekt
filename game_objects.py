@@ -4,14 +4,12 @@ import settings
 
 
 class GameObject:
-    def __init__(self, x=0, y=0, radius=0, test=0):
+    def __init__(self, x=0, y=0):
         self.x = x
         self.y = y
-        self.radius = radius
-        self.test = test
 
 
-    def draw(self, screen, color=settings.WHITE, radius=0):
+    def draw_circle(self, screen, color=settings.WHITE, radius=0):
         pygame.draw.circle(screen, color, (int(self.x), int(self.y)), self.radius)
 
     def update(self):
@@ -20,7 +18,8 @@ class GameObject:
 
 class Bird(GameObject):
     def __init__(self, x, y, radius):
-        super().__init__(x, y, radius)
+        super().__init__(x, y)
+        self.radius = radius
         self.velocity = -5
         self.gravity = 0.3
         self.jump_strength = -5
@@ -49,12 +48,13 @@ class Bird(GameObject):
 
 class Coin(GameObject):
     def __init__(self, x, y, radius=8):
-        super().__init__(x, y, radius)
+        super().__init__(x, y)
+        self.radius = radius
         self.collected = False
 
-    def draw(self, screen, color):
+    def draw_circle(self, screen, color):
         if not self.collected:
-            super().draw(screen, color)
+            super().draw_circle(screen, color)
             # pygame.draw.circle(screen, settings.YELLOW, (int(self.x), int(self.y)), self.radius)
 
     def check_collision(self, bird):
@@ -74,9 +74,9 @@ class Pipe(GameObject):
         self.gap_y = random.randint(100, settings.HEIGHT - settings.floor_height - 100)
         self.scored = False
 
-        coin_y = random.randint(
-            self.gap_y + 10, self.gap_y + self.gap_height - 10)
-        self.coin = Coin(self.x + self.width // 2, coin_y)
+        self._create_coin()
+        # coin_y = random.randint(self.gap_y + 10, self.gap_y + self.gap_height - 10)
+        # self.coin = Coin(self.x + self.width // 2, coin_y)
 
     def update(self):
         self.x -= self.speed
@@ -86,11 +86,15 @@ class Pipe(GameObject):
             self.gap_y = random.randint(
                 100, settings.HEIGHT - settings.floor_height - 100)
             self.scored = False
-            coin_y = random.randint(
-                self.gap_y + 10, self.gap_y + self.gap_height - 10)
-            self.coin = Coin(self.x + self.width // 2, coin_y)
+            self._create_coin()
+            # coin_y = random.randint(self.gap_y + 10, self.gap_y + self.gap_height - 10)
+            # self.coin = Coin(self.x + self.width // 2, coin_y)
 
         self.coin.x = self.x + self.width // 2
+
+    def _create_coin(self):
+        coin_y = random.randint(self.gap_y + 20, self.gap_y + self.gap_height - 20)
+        self.coin = Coin(self.x + self.width // 2, coin_y)
 
     def draw(self, screen):
         pygame.draw.rect(screen, settings.GREEN, (self.x, 0, self.width, self.gap_y))
