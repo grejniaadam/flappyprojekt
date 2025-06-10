@@ -94,9 +94,9 @@ class Game:
                     time.sleep(2)
                     self.game_active = False
 
-                # elif collision == "bounce":
-                #     print("🟡 JANUSZ OTARŁ SIĘ O RURĘ – ODBICIE")
-                #     self.bird.velocity = -self.bird.velocity * 0.5
+                elif collision == "bounce":
+                    print("🟡 JANUSZ OTARŁ SIĘ O RURĘ – ODBICIE")
+                    self.bird.velocity = -self.bird.velocity * 0.5
 
                 self.screen.fill(settings.WHITE)
                 self.bird.draw(self.screen, settings.BLUE)
