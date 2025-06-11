@@ -1,7 +1,7 @@
 import pygame
 import time
 import settings
-from game_objects import Bird, Pipe
+from game_objects import Bird, Heavy_bird, Light_Bird, Pipe
 
 
 # Klasa Game - główna klasa
@@ -22,9 +22,12 @@ class Game:
         self.title = settings.big_font.render("FLAPPY JANUSZ", True, settings.BLUE)
         self.start_game_title = settings.font.render("SPACAJA = START", True, settings.BLUE)
 
+        # Tworzymy obiekty (Bird i Pipe)
+        self._reset_game()
+
         # Tworzenie obiektów
-        self.bird = Bird(50, settings.HEIGHT // 2, 15)
-        self.pipe = Pipe(settings.WIDTH, 60, 150, 3)
+        # self.bird = Bird(50, settings.HEIGHT // 2, 15)
+        # self.pipe = Pipe(settings.WIDTH, 60, 150, 3)
 
     def _draw_start_menu(self):
         """Metoda do 'rysowania' głównego menu"""
@@ -57,8 +60,8 @@ class Game:
 
     def _reset_game(self): 
         """Metoda do resetowania stanu gry"""
-        self.bird = Bird(50, settings.HEIGHT // 2, 15)
-        self.pipe = Pipe(settings.WIDTH, 60, 150, 3)
+        self.bird = Light_Bird(50, settings.HEIGHT // 2, 15)
+        self.pipe = Pipe(settings.WIDTH, 60, 150, 3)  
         self.score = 0
         
 

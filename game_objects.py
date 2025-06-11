@@ -8,7 +8,6 @@ class GameObject:
         self.x = x
         self.y = y
 
-
     def draw_circle(self, screen, color=settings.WHITE, radius=0):
         pygame.draw.circle(screen, color, (int(self.x), int(self.y)), self.radius)
 
@@ -41,9 +40,31 @@ class Bird(GameObject):
             self.velocity = 0
             print("KURŁA JEBŁEM W SUFIT!")
 
-    # def draw(self, screen, color):
-    #     super().draw(screen, color, self.radius)
-        # pygame.draw.circle(screen, color, (int(self.x), int(self.y)), self.radius)
+class Heavy_bird(Bird):
+    gravity = 0.5
+    jump_strenght = -7
+
+    def __init__(self, x, y, radius):
+        super().__init__(x, y, radius)
+
+        self.gravity = Heavy_bird.gravity
+        self.jump_strenght = Heavy_bird.jump_strenght
+
+    def draw(self, screen, color):
+        super().draw(settings.RED)
+
+class Light_Bird(Bird):
+    gravity = 0.1
+    jump_strenght = -2
+
+    def __init__(self, x, y, radius):
+        super().__init__(x, y, radius)
+
+        self.gravity = Light_Bird.gravity
+        self.jump_strenght = Light_Bird.jump_strenght
+
+    def draw(self):
+        super().draw(settings.ORANGE)
 
 
 class Coin(GameObject):
