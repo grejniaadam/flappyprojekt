@@ -16,8 +16,8 @@ class Game:
 
         # Inicjalizacja stnu gry
         self.game_active = False
-        self.high_score = 0
-        self.score = 0
+        self._high_score = 0
+        self._score = 0
 
         self.title = settings.big_font.render("FLAPPY JANUSZ", True, settings.BLUE)
         self.start_game_title = settings.font.render("SPACAJA = START", True, settings.BLUE)
@@ -25,15 +25,27 @@ class Game:
         # Tworzymy obiekty (Bird i Pipe)
         self._reset_game()
 
-        # Tworzenie obiektów
-        # self.bird = Bird(50, settings.HEIGHT // 2, 15)
-        # self.pipe = Pipe(settings.WIDTH, 60, 150, 3)
+    @property
+    def score(self):
+        return self._score
+    
+    @score.setter
+    def score(self, value):
+        print(f"--- JESTEM W SETTERZE --- {value}")
+        if value > 0:
+            self._score = value
+        else:
+            self._score = 0
+
+        if self._score > self._high_score:
+            self._high_score = self._score
+    
 
     def _draw_start_menu(self):
         """Metoda do 'rysowania' głównego menu"""
         self.screen.fill((settings.WHITE))
 
-        highScore = settings.font.render(f"REKORD: {self.high_score}", True, (0, 0, 0))
+        highScore = settings.font.render(f"REKORD: {self._high_score}", True, (0, 0, 0))
 
         title_rect = self.title.get_rect(center=(settings.WIDTH // 2, 150))
         start_game_rect = self.start_game_title.get_rect(center=(settings.WIDTH // 2, 300))
@@ -49,7 +61,7 @@ class Game:
         self.screen.fill((settings.WHITE))
 
         msg_if_bird_dead = settings.big_font.render("JANUSZ JEBNĄŁ W RURĘ!", True, (200, 0, 0))
-        end_score = settings.font.render(f"WYNIK: {self.score}", True, (0, 0, 0))
+        end_score = settings.font.render(f"WYNIK: {self._score}", True, (0, 0, 0))
 
         msg_rect = msg_if_bird_dead.get_rect(center=(settings.WIDTH // 2, 200))
         score_rect = end_score.get_rect(center=(settings.WIDTH // 2, 250))
@@ -60,7 +72,7 @@ class Game:
 
     def _reset_game(self): 
         """Metoda do resetowania stanu gry"""
-        self.bird = Light_Bird(50, settings.HEIGHT // 2, 15)
+        self.bird = Bird(50, settings.HEIGHT // 2, 15)
         self.pipe = Pipe(settings.WIDTH, 60, 150, 3)  
         self.score = 0
         
@@ -91,8 +103,6 @@ class Game:
 
                 if collision == "hit":
                     print("💀 JANUSZ WJEBANY W RURĘ – GAME OVER")   
-                    if self.score > self.high_score:
-                        self.high_score = self.score
                     self._draw_game_over()
                     time.sleep(2)
                     self.game_active = False
