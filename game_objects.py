@@ -2,18 +2,16 @@ import pygame
 import random
 import settings
 
-
 class GameObject:
     def __init__(self, x=0, y=0):
         self.x = x
         self.y = y
 
-    def draw_circle(self, screen, color=settings.WHITE, radius=0):
-        pygame.draw.circle(screen, color, (int(self.x), int(self.y)), self.radius)
+    def draw(self, screen):
+        pass
 
     def update(self):
         pass
-
 
 class Bird(GameObject):
     def __init__(self, x, y, radius):
@@ -22,9 +20,13 @@ class Bird(GameObject):
         self.velocity = -5
         self.gravity = 0.3
         self.jump_strength = -5
+        self.color = settings.BLUE
 
     def jump(self):
         self.velocity += self.jump_strength
+
+    def draw(self, screen):
+        pygame.draw.circle(screen, self.color, (int(self.x), int(self.y)), self.radius)
 
     def update(self, floor_y):
         self.velocity += self.gravity
@@ -33,50 +35,48 @@ class Bird(GameObject):
         if self.y + self.radius > floor_y:
             self.y = floor_y - self.radius
             self.velocity = 0
-            print("JANUSZ WPIERDOLIŁ SIĘ W ZIEMIĘ!")
- 
+    
         if self.y - self.radius < 0:
             self.y = self.radius
             self.velocity = 0
-            print("KURŁA JEBŁEM W SUFIT!")
 
 class Heavy_bird(Bird):
     gravity = 0.5
-    jump_strenght = -7
+    jump_strength = -7
 
     def __init__(self, x, y, radius):
         super().__init__(x, y, radius)
-
         self.gravity = Heavy_bird.gravity
-        self.jump_strenght = Heavy_bird.jump_strenght
-
-    def draw(self, screen, color):
-        super().draw(settings.RED)
+        self.jump_strength = Heavy_bird.jump_strength
+        self.color = settings.RED
 
 class Light_Bird(Bird):
-    gravity = 0.1
-    jump_strenght = -2
+    gravity = 0.2
+    jump_strength = -4
 
     def __init__(self, x, y, radius):
         super().__init__(x, y, radius)
-
         self.gravity = Light_Bird.gravity
-        self.jump_strenght = Light_Bird.jump_strenght
+        self.jump_strength = Light_Bird.jump_strength
+        self.color = settings.ORANGE
 
-    def draw(self):
-        super().draw(settings.ORANGE)
-
+class Random_Bird(Bird):
+    def __init__(self, x, y, radius):
+        super().__init__(x, y, radius)
+        self.gravity = random.uniform(0.2, 0.7)
+        self.jump_strength = random.uniform(-8.0, -4.0)
+        self.color = (random.randint(50, 255), random.randint(50, 255), random.randint(50, 255))
 
 class Coin(GameObject):
     def __init__(self, x, y, radius=8):
         super().__init__(x, y)
         self.radius = radius
         self.collected = False
+        self.color = settings.YELLOW
 
-    def draw_circle(self, screen, color):
+    def draw(self, screen):
         if not self.collected:
-            super().draw_circle(screen, color)
-            # pygame.draw.circle(screen, settings.YELLOW, (int(self.x), int(self.y)), self.radius)
+            pygame.draw.circle(screen, self.color, (int(self.x), int(self.y)), self.radius)
 
     def check_collision(self, bird):
         distance = ((self.x - bird.x) ** 2 + (self.y - bird.y) ** 2) ** 0.5
@@ -85,32 +85,23 @@ class Coin(GameObject):
             return True
         return False
 
-
 class Pipe(GameObject):
     def __init__(self, x, width, gap_height, speed):
         super().__init__(x)
         self.width = width
         self.gap_height = gap_height
         self.speed = speed
-        self.gap_y = random.randint(100, settings.HEIGHT - settings.floor_height - 100)
+        self.gap_y = random.randint(100, settings.HEIGHT - settings.floor_height - 200)
         self.scored = False
-
         self._create_coin()
-        # coin_y = random.randint(self.gap_y + 10, self.gap_y + self.gap_height - 10)
-        # self.coin = Coin(self.x + self.width // 2, coin_y)
 
     def update(self):
         self.x -= self.speed
-
         if self.x + self.width < 0:
             self.x = settings.WIDTH
-            self.gap_y = random.randint(
-                100, settings.HEIGHT - settings.floor_height - 100)
+            self.gap_y = random.randint(100, settings.HEIGHT - settings.floor_height - 200)
             self.scored = False
             self._create_coin()
-            # coin_y = random.randint(self.gap_y + 10, self.gap_y + self.gap_height - 10)
-            # self.coin = Coin(self.x + self.width // 2, coin_y)
-
         self.coin.x = self.x + self.width // 2
 
     def _create_coin(self):
@@ -119,8 +110,7 @@ class Pipe(GameObject):
 
     def draw(self, screen):
         pygame.draw.rect(screen, settings.GREEN, (self.x, 0, self.width, self.gap_y))
-        pygame.draw.rect(screen, settings.GREEN, (self.x, self.gap_y + self.gap_height, self.width, 
-                                                  settings.HEIGHT - self.gap_y - self.gap_height - settings.floor_height))
+        pygame.draw.rect(screen, settings.GREEN, (self.x, self.gap_y + self.gap_height, self.width, settings.HEIGHT - self.gap_y - self.gap_height - settings.floor_height))
 
     def check_collision(self, bird):
         bird_top = bird.y - bird.radius
@@ -134,12 +124,8 @@ class Pipe(GameObject):
         in_x_range = bird_right > pipe_left and bird_left < pipe_right
         in_gap = bird_top > self.gap_y and bird_bottom < self.gap_y + self.gap_height
 
-        if in_x_range and (
-                abs(bird_top - self.gap_y) < 10 or
-                abs(bird_bottom - (self.gap_y + self.gap_height)) < 10):
+        if in_x_range and (abs(bird_top - self.gap_y) < 10 or abs(bird_bottom - (self.gap_y + self.gap_height)) < 10):
             return "bounce"
-
         if in_x_range and not in_gap:
             return "hit"
-
         return "clear"

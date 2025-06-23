@@ -15,6 +15,7 @@ YELLOW = (255, 215, 0) # Coin
 BLUE = (0, 0, 255) # Standard_Bird (Bird)
 RED = (255, 0, 0) # Heavy_bird
 ORANGE = (251, 152, 2)
+BLACK = (0, 0, 0)
 
 
 

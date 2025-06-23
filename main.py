@@ -1,7 +1,7 @@
 import pygame
 import time
 import settings
-from game_objects import Bird, Heavy_bird, Light_Bird, Pipe
+from game_objects import Bird, Heavy_bird, Light_Bird, Random_Bird, Pipe
 
 
 # Klasa Game - główna klasa
@@ -31,7 +31,7 @@ class Game:
     
     @score.setter
     def score(self, value):
-        print(f"--- JESTEM W SETTERZE --- {value}")
+        # print(f"--- JESTEM W SETTERZE --- {value}")
         if value > 0:
             self._score = value
         else:
@@ -69,11 +69,11 @@ class Game:
         self.screen.blit(msg_if_bird_dead, msg_rect)
         self.screen.blit(end_score, score_rect)
         pygame.display.update()
-
+ 
     def _reset_game(self): 
         """Metoda do resetowania stanu gry"""
         self.bird = Bird(50, settings.HEIGHT // 2, 15)
-        self.pipe = Pipe(settings.WIDTH, 60, 150, 3)  
+        self.pipe = Pipe(settings.WIDTH, 60, 150, 3)
         self.score = 0
         
 
@@ -96,13 +96,13 @@ class Game:
 
                 if self.pipe.coin.check_collision(self.bird):
                     self.score += 1
-                    print("💰 MONETA ZEBRANA! +1 punkt")
+                    # print("💰 MONETA ZEBRANA! +1 punkt")
 
                 if not self.pipe.scored and self.pipe.x + self.pipe.width < self.bird.x:
                     self.pipe.scored = True
 
                 if collision == "hit":
-                    print("💀 JANUSZ WJEBANY W RURĘ – GAME OVER")   
+                    # print("💀 JANUSZ WJEBANY W RURĘ – GAME OVER")   
                     self._draw_game_over()
                     time.sleep(2)
                     self.game_active = False
@@ -112,9 +112,9 @@ class Game:
                 #     self.bird.velocity = -self.bird.velocity * 0.5
 
                 self.screen.fill(settings.WHITE)
-                self.bird.draw_circle(self.screen, settings.BLUE)
+                self.bird.draw(self.screen)
                 self.pipe.draw(self.screen)
-                self.pipe.coin.draw_circle(self.screen, settings.YELLOW)
+                self.pipe.coin.draw(self.screen)
                 pygame.draw.rect(self.screen, (100, 100, 100), (0, settings.floor_y, settings.WIDTH, settings.floor_height))
                 score_text = settings.font.render(f"WYNIK: {self.score}", True, settings.BLUE)
                 self.screen.blit(score_text, (10, 10))
