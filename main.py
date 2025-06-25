@@ -1,7 +1,7 @@
 import pygame
 import time
 import settings
-from game_objects import Bird, Heavy_bird, Light_Bird, Random_Bird, Pipe
+from game_objects import Bird, Heavy_bird, Light_Bird, Random_Bird, Pipe, InvalidPipeConfigError, StaticMovmentStrategy, VerticalMovmentStrategy
 
 
 # Klasa Game - główna klasa
@@ -73,7 +73,22 @@ class Game:
     def _reset_game(self): 
         """Metoda do resetowania stanu gry"""
         self.bird = Bird(50, settings.HEIGHT // 2, 15)
-        self.pipe = Pipe(settings.WIDTH, 60, 150, 3)
+
+        try:
+            """Statyczne rury"""
+            # movement_pipe = StaticMovmentStrategy()
+
+            """Ruchome rury"""
+            movement_pipe = VerticalMovmentStrategy()
+
+            self.pipe = Pipe(settings.WIDTH, width=60, gap_height=150, speed=3, movement_strategy=movement_pipe)
+
+        except InvalidPipeConfigError as e:
+            print(f"Błąd konfiguracji! {e}")
+            print("Gra nie może zostać poprawnie uruchomiona")
+            pygame.quit()
+            exit()
+        
         self.score = 0
         
 

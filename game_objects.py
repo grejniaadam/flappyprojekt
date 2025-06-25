@@ -1,6 +1,34 @@
 import pygame
 import random
 import settings
+from abc import ABC, abstractmethod
+
+class MovementStrategy(ABC):
+    @abstractmethod
+    def update(self, pipe):
+        pass
+
+class StaticMovmentStrategy(MovementStrategy):
+    def update(self, pipe):
+        pipe.x -= pipe.speed
+
+class VerticalMovmentStrategy(MovementStrategy):
+    def __init__(self, vertical_speed=1, move_range=40):
+        self.vertical_speed = vertical_speed
+        self.move_range = move_range
+        self.direction = 1
+
+    def update(self, pipe):
+        pipe.x -= pipe.speed
+        pipe.gap_y += self.vertical_speed * self.direction
+
+        if pipe.gap_y > pipe.initial_gap_y + self.move_range or pipe.gap_y < pipe.initial_gap_y - self.move_range: 
+            self.direction *= -1
+
+        
+class InvalidPipeConfigError(Exception):
+    """Błąd rzucany w momencie gdy paramerty rury są nielogiczne"""
+    pass
 
 class GameObject:
     def __init__(self, x=0, y=0):
@@ -85,23 +113,42 @@ class Coin(GameObject):
             return True
         return False
 
+# W pliku game_objects.py
+
 class Pipe(GameObject):
-    def __init__(self, x, width, gap_height, speed):
+    def __init__(self, x, width, gap_height, speed, movement_strategy: MovementStrategy):
         super().__init__(x)
         self.width = width
         self.gap_height = gap_height
         self.speed = speed
-        self.gap_y = random.randint(100, settings.HEIGHT - settings.floor_height - 200)
         self.scored = False
+        self.movement_strategy = movement_strategy
+
+        # Losujemy pozycję przerwy i od razu zapisujemy ją jako pozycję początkową
+        min_y = 100
+        max_y = settings.HEIGHT - settings.floor_height - self.gap_height - 100
+        self.gap_y = random.randint(min_y, max_y)
+        self.initial_gap_y = self.gap_y 
+
         self._create_coin()
 
     def update(self):
-        self.x -= self.speed
+        self.movement_strategy.update(self)
+
         if self.x + self.width < 0:
             self.x = settings.WIDTH
-            self.gap_y = random.randint(100, settings.HEIGHT - settings.floor_height - 200)
+            # Resetujemy pozycję przerwy do nowego, losowego miejsca
+            min_y = 100
+            max_y = settings.HEIGHT - settings.floor_height - self.gap_height - 100
+            self.gap_y = random.randint(min_y, max_y)
+            self.initial_gap_y = self.gap_y 
+            
             self.scored = False
             self._create_coin()
+
+            # self.movement_strategy.reset()
+
+        # Moneta nadal podąża za rurą
         self.coin.x = self.x + self.width // 2
 
     def _create_coin(self):
@@ -117,13 +164,10 @@ class Pipe(GameObject):
         bird_bottom = bird.y + bird.radius
         bird_left = bird.x - bird.radius
         bird_right = bird.x + bird.radius
-
         pipe_right = self.x + self.width
         pipe_left = self.x
-
         in_x_range = bird_right > pipe_left and bird_left < pipe_right
         in_gap = bird_top > self.gap_y and bird_bottom < self.gap_y + self.gap_height
-
         if in_x_range and (abs(bird_top - self.gap_y) < 10 or abs(bird_bottom - (self.gap_y + self.gap_height)) < 10):
             return "bounce"
         if in_x_range and not in_gap:
