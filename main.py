@@ -1,8 +1,10 @@
+# Plik: main.py
 import pygame
 import time
 import settings
-from game_objects import Bird, Heavy_bird, Light_Bird, Random_Bird, Pipe, InvalidPipeConfigError, StaticMovmentStrategy, VerticalMovmentStrategy
-
+from game_objects import Bird, Heavy_bird, Light_Bird, Random_Bird, Pipe
+from strategies import StaticCoinStrategy, VerticalCoinStrategy, StaticPipeStrategy, VerticalPipeStrategy
+from exceptions import InvalidPipeConfigError
 
 # Klasa Game - główna klasa
 class Game:
@@ -14,7 +16,7 @@ class Game:
         self.clock = pygame.time.Clock()
         pygame.display.set_caption("Flappy Janusz")
 
-        # Inicjalizacja stnu gry
+        # Inicjalizacja stanu gry
         self.game_active = False
         self._high_score = 0
         self._score = 0
@@ -39,7 +41,7 @@ class Game:
 
         if self._score > self._high_score:
             self._high_score = self._score
-    
+     
 
     def _draw_start_menu(self):
         """Metoda do 'rysowania' głównego menu"""
@@ -76,19 +78,19 @@ class Game:
 
         try:
             """Statyczne rury"""
-            # movement_pipe = StaticMovmentStrategy()
+            movement_pipe = StaticPipeStrategy()
 
             """Ruchome rury"""
-            movement_pipe = VerticalMovmentStrategy()
+            # movement_pipe = VerticalPipeStrategy()
 
             self.pipe = Pipe(settings.WIDTH, width=60, gap_height=150, speed=3, movement_strategy=movement_pipe)
-
+ 
         except InvalidPipeConfigError as e:
             print(f"Błąd konfiguracji! {e}")
             print("Gra nie może zostać poprawnie uruchomiona")
             pygame.quit()
             exit()
-        
+
         self.score = 0
         
 
@@ -111,20 +113,14 @@ class Game:
 
                 if self.pipe.coin.check_collision(self.bird):
                     self.score += 1
-                    # print("💰 MONETA ZEBRANA! +1 punkt")
 
                 if not self.pipe.scored and self.pipe.x + self.pipe.width < self.bird.x:
                     self.pipe.scored = True
 
                 if collision == "hit":
-                    # print("💀 JANUSZ WJEBANY W RURĘ – GAME OVER")   
                     self._draw_game_over()
                     time.sleep(2)
                     self.game_active = False
-
-                # elif collision == "bounce":
-                #     print("🟡 JANUSZ OTARŁ SIĘ O RURĘ – ODBICIE")
-                #     self.bird.velocity = -self.bird.velocity * 0.5
 
                 self.screen.fill(settings.WHITE)
                 self.bird.draw(self.screen)

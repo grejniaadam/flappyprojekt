@@ -1,34 +1,8 @@
 import pygame
 import random
 import settings
-from abc import ABC, abstractmethod
-
-class MovementStrategy(ABC):
-    @abstractmethod
-    def update(self, pipe):
-        pass
-
-class StaticMovmentStrategy(MovementStrategy):
-    def update(self, pipe):
-        pipe.x -= pipe.speed
-
-class VerticalMovmentStrategy(MovementStrategy):
-    def __init__(self, vertical_speed=1, move_range=40):
-        self.vertical_speed = vertical_speed
-        self.move_range = move_range
-        self.direction = 1
-
-    def update(self, pipe):
-        pipe.x -= pipe.speed
-        pipe.gap_y += self.vertical_speed * self.direction
-
-        if pipe.gap_y > pipe.initial_gap_y + self.move_range or pipe.gap_y < pipe.initial_gap_y - self.move_range: 
-            self.direction *= -1
-
-        
-class InvalidPipeConfigError(Exception):
-    """Błąd rzucany w momencie gdy paramerty rury są nielogiczne"""
-    pass
+from strategies import PipeMovementStrategy, StaticCoinStrategy, VerticalCoinStrategy, CoinMovementStrategy
+from exceptions import InvalidPipeConfigError
 
 class GameObject:
     def __init__(self, x=0, y=0):
@@ -95,13 +69,19 @@ class Random_Bird(Bird):
         self.jump_strength = random.uniform(-8.0, -4.0)
         self.color = (random.randint(50, 255), random.randint(50, 255), random.randint(50, 255))
 
+
 class Coin(GameObject):
-    def __init__(self, x, y, radius=8):
+    def __init__(self, x, y, movement_strategy: CoinMovementStrategy, radius=8):
         super().__init__(x, y)
+        self.initial_y = y
         self.radius = radius
         self.collected = False
         self.color = settings.YELLOW
+        self.movement_strategy = movement_strategy
 
+    def update(self, pipe):
+        self.movement_strategy.update(self, pipe)
+    
     def draw(self, screen):
         if not self.collected:
             pygame.draw.circle(screen, self.color, (int(self.x), int(self.y)), self.radius)
@@ -113,23 +93,23 @@ class Coin(GameObject):
             return True
         return False
 
-# W pliku game_objects.py
-
 class Pipe(GameObject):
-    def __init__(self, x, width, gap_height, speed, movement_strategy: MovementStrategy):
+    def __init__(self, x, width, gap_height, speed, movement_strategy: PipeMovementStrategy):
         super().__init__(x)
+        if gap_height <= 0:
+            raise InvalidPipeConfigError(f"Wysokość przerwy (gap_height) musi być dodatnia, a jest: {gap_height}")
+        if gap_height >= settings.HEIGHT - settings.floor_height:
+             raise InvalidPipeConfigError("Wysokość przerwy (gap_height) jest większa niż dostępna wysokość ekranu.")
+
         self.width = width
         self.gap_height = gap_height
         self.speed = speed
         self.scored = False
         self.movement_strategy = movement_strategy
-
-        # Losujemy pozycję przerwy i od razu zapisujemy ją jako pozycję początkową
         min_y = 100
         max_y = settings.HEIGHT - settings.floor_height - self.gap_height - 100
         self.gap_y = random.randint(min_y, max_y)
-        self.initial_gap_y = self.gap_y 
-
+        self.initial_gap_y = self.gap_y
         self._create_coin()
 
     def update(self):
@@ -137,23 +117,25 @@ class Pipe(GameObject):
 
         if self.x + self.width < 0:
             self.x = settings.WIDTH
-            # Resetujemy pozycję przerwy do nowego, losowego miejsca
             min_y = 100
             max_y = settings.HEIGHT - settings.floor_height - self.gap_height - 100
             self.gap_y = random.randint(min_y, max_y)
-            self.initial_gap_y = self.gap_y 
-            
+            self.initial_gap_y = self.gap_y
             self.scored = False
             self._create_coin()
 
-            # self.movement_strategy.reset()
-
-        # Moneta nadal podąża za rurą
         self.coin.x = self.x + self.width // 2
+        self.coin.update(self)
 
     def _create_coin(self):
-        coin_y = random.randint(self.gap_y + 20, self.gap_y + self.gap_height - 20)
-        self.coin = Coin(self.x + self.width // 2, coin_y)
+        coin_y = random.randint(self.gap_y + 40, self.gap_y + self.gap_height - 40)
+        """Statyczna moneta"""
+        # coin_strategy = StaticCoinStrategy()
+
+        """Ruchoma moneta"""
+        coin_strategy = VerticalCoinStrategy(vertical_speed=1, move_range=25)
+
+        self.coin = Coin(self.x + self.width // 2, coin_y, movement_strategy=coin_strategy)
 
     def draw(self, screen):
         pygame.draw.rect(screen, settings.GREEN, (self.x, 0, self.width, self.gap_y))
@@ -173,3 +155,4 @@ class Pipe(GameObject):
         if in_x_range and not in_gap:
             return "hit"
         return "clear"
+    
