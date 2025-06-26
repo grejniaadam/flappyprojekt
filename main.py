@@ -6,6 +6,7 @@ from game_objects import Bird, Heavy_bird, Light_Bird, Random_Bird, Pipe
 from strategies import StaticCoinStrategy, VerticalCoinStrategy, StaticPipeStrategy, VerticalPipeStrategy
 from exceptions import InvalidPipeConfigError
 from game_states import State, MenuState, PlayingState
+from textures import Textures
 
 # Klasa Game - główna klasa
 class Game:
@@ -15,6 +16,7 @@ class Game:
         pygame.init()
         self.screen = pygame.display.set_mode((settings.WIDTH, settings.HEIGHT))
         self.clock = pygame.time.Clock()
+        Textures.load()
         pygame.display.set_caption("Flappy Janusz")
 
         # Inicjalizacja stanu gry
@@ -69,10 +71,10 @@ class Game:
 
         try:
             """Statyczne rury"""
-            movement_pipe = StaticPipeStrategy()
+            #movement_pipe = StaticPipeStrategy()
 
             """Ruchome rury"""
-            # movement_pipe = VerticalPipeStrategy()
+            movement_pipe = VerticalPipeStrategy()
 
             self.pipe = Pipe(settings.WIDTH, width=60, gap_height=150, speed=3, movement_strategy=movement_pipe)
  

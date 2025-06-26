@@ -3,6 +3,7 @@ import random
 import settings
 from strategies import PipeMovementStrategy, StaticCoinStrategy, VerticalCoinStrategy, CoinMovementStrategy
 from exceptions import InvalidPipeConfigError
+from textures import Textures
 
 class GameObject:
     def __init__(self, x=0, y=0):
@@ -28,7 +29,9 @@ class Bird(GameObject):
         self.velocity += self.jump_strength
 
     def draw(self, screen):
-        pygame.draw.circle(screen, self.color, (int(self.x), int(self.y)), self.radius)
+        bird_image = Textures.BIRD
+        bird_rect = bird_image.get_rect(center=(int(self.x), int(self.y)))
+        screen.blit(bird_image, bird_rect)
 
     def update(self, floor_y):
         self.velocity += self.gravity
@@ -71,24 +74,30 @@ class Random_Bird(Bird):
 
 
 class Coin(GameObject):
-    def __init__(self, x, y, movement_strategy: CoinMovementStrategy, radius=8):
-        super().__init__(x, y)
-        self.initial_y = y
-        self.radius = radius
+    def __init__(self, x, y, movement_strategy, radius=None):
+        super().__init__(x)
+        self.y = y
         self.collected = False
         self.color = settings.YELLOW
         self.movement_strategy = movement_strategy
 
+        if radius is None:
+            self.radius = Textures.COIN.get_width() // 2
+        else:
+            self.radius = radius
+
+        self.initial_y = y
+
     def update(self, pipe):
         self.movement_strategy.update(self, pipe)
-    
+
     def draw(self, screen):
         if not self.collected:
-            pygame.draw.circle(screen, self.color, (int(self.x), int(self.y)), self.radius)
+            screen.blit(Textures.COIN, (self.x - self.radius, self.y - self.radius))
 
     def check_collision(self, bird):
         distance = ((self.x - bird.x) ** 2 + (self.y - bird.y) ** 2) ** 0.5
-        if distance < self.radius + bird.radius and not self.collected:
+        if distance <= self.radius + bird.radius and not self.collected:
             self.collected = True
             return True
         return False
@@ -130,16 +139,29 @@ class Pipe(GameObject):
     def _create_coin(self):
         coin_y = random.randint(self.gap_y + 40, self.gap_y + self.gap_height - 40)
         """Statyczna moneta"""
-        coin_strategy = StaticCoinStrategy()
+        #coin_strategy = StaticCoinStrategy()
 
         """Ruchoma moneta"""
-        # coin_strategy = VerticalCoinStrategy(vertical_speed=1, move_range=25)
+        coin_strategy = VerticalCoinStrategy(vertical_speed=1, move_range=25)
 
         self.coin = Coin(self.x + self.width // 2, coin_y, movement_strategy=coin_strategy)
 
     def draw(self, screen):
-        pygame.draw.rect(screen, settings.GREEN, (self.x, 0, self.width, self.gap_y))
-        pygame.draw.rect(screen, settings.GREEN, (self.x, self.gap_y + self.gap_height, self.width, settings.HEIGHT - self.gap_y - self.gap_height - settings.floor_height))
+        # GÓRNA rura (ciało)
+        y = self.gap_y - Textures.PIPE_END.get_height()
+        while y > -Textures.PIPE_BODY.get_height():
+            screen.blit(Textures.PIPE_BODY, (self.x, y))
+            y -= Textures.PIPE_BODY.get_height()
+        screen.blit(Textures.PIPE_END_FLIPPED, (self.x, self.gap_y - Textures.PIPE_END.get_height()))
+
+        # DOLNA rura (ciało)
+        bottom_y = self.gap_y + self.gap_height
+        y = bottom_y
+        while y < settings.HEIGHT - settings.floor_height:
+            screen.blit(Textures.PIPE_BODY, (self.x, y))
+            y += Textures.PIPE_BODY.get_height()
+        screen.blit(Textures.PIPE_END, (self.x, bottom_y - 1))  # -1 żeby się ładnie stykało
+
 
     def check_collision(self, bird):
         bird_top = bird.y - bird.radius
