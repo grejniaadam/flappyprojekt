@@ -130,10 +130,10 @@ class Pipe(GameObject):
     def _create_coin(self):
         coin_y = random.randint(self.gap_y + 40, self.gap_y + self.gap_height - 40)
         """Statyczna moneta"""
-        # coin_strategy = StaticCoinStrategy()
+        coin_strategy = StaticCoinStrategy()
 
         """Ruchoma moneta"""
-        coin_strategy = VerticalCoinStrategy(vertical_speed=1, move_range=25)
+        # coin_strategy = VerticalCoinStrategy(vertical_speed=1, move_range=25)
 
         self.coin = Coin(self.x + self.width // 2, coin_y, movement_strategy=coin_strategy)
 

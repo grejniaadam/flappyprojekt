@@ -5,6 +5,7 @@ import settings
 from game_objects import Bird, Heavy_bird, Light_Bird, Random_Bird, Pipe
 from strategies import StaticCoinStrategy, VerticalCoinStrategy, StaticPipeStrategy, VerticalPipeStrategy
 from exceptions import InvalidPipeConfigError
+from game_states import State, MenuState, PlayingState
 
 # Klasa Game - główna klasa
 class Game:
@@ -17,15 +18,18 @@ class Game:
         pygame.display.set_caption("Flappy Janusz")
 
         # Inicjalizacja stanu gry
-        self.game_active = False
+        self.running = True
+        self.state: State = None
+
         self._high_score = 0
         self._score = 0
-
+        self.pipes_passed = 0
+        self.bird = None
+        self.pipe = None
         self.title = settings.big_font.render("FLAPPY JANUSZ", True, settings.BLUE)
         self.start_game_title = settings.font.render("SPACAJA = START", True, settings.BLUE)
 
-        # Tworzymy obiekty (Bird i Pipe)
-        self._reset_game()
+        self.change_state(MenuState(self))
 
     @property
     def score(self):
@@ -41,22 +45,9 @@ class Game:
 
         if self._score > self._high_score:
             self._high_score = self._score
-     
 
-    def _draw_start_menu(self):
-        """Metoda do 'rysowania' głównego menu"""
-        self.screen.fill((settings.WHITE))
-
-        highScore = settings.font.render(f"REKORD: {self._high_score}", True, (0, 0, 0))
-
-        title_rect = self.title.get_rect(center=(settings.WIDTH // 2, 150))
-        start_game_rect = self.start_game_title.get_rect(center=(settings.WIDTH // 2, 300))
-        highScore_rect = highScore.get_rect(center=(settings.WIDTH // 2, 400))
-
-        self.screen.blit(self.title, title_rect)
-        self.screen.blit(self.start_game_title, start_game_rect)
-        self.screen.blit(highScore, highScore_rect)
-        pygame.display.update()
+    def change_state(self, new_state: State):
+        self.state = new_state
 
     def _draw_game_over(self):
         """Metoda do 'rysowania' informacji po zakończeniu gry"""
@@ -72,7 +63,7 @@ class Game:
         self.screen.blit(end_score, score_rect)
         pygame.display.update()
  
-    def _reset_game(self): 
+    def _reset_game_logic(self):
         """Metoda do resetowania stanu gry"""
         self.bird = Bird(50, settings.HEIGHT // 2, 15)
 
@@ -88,60 +79,24 @@ class Game:
         except InvalidPipeConfigError as e:
             print(f"Błąd konfiguracji! {e}")
             print("Gra nie może zostać poprawnie uruchomiona")
-            pygame.quit()
-            exit()
+            self.running = False
 
         self.score = 0
+        self.pipes_passed = 0
         
 
-    def _run(self):
-        running = True
-        while running:
-            self.clock.tick(settings.FPS)
+    def run(self):
+        while self.running:
+            events = pygame.event.get()
 
-            if self.game_active:
-                for event in pygame.event.get():
-                    if event.type == pygame.QUIT:
-                        running = False
-                    if event.type == pygame.KEYDOWN:
-                        if event.key == pygame.K_SPACE:
-                            self.bird.jump()
+            self.state.handle_events(events)
+            self.state.update()
+            self.state.draw(self.screen)
 
-                self.bird.update(settings.floor_y)
-                self.pipe.update()
-                collision = self.pipe.check_collision(self.bird)
-
-                if self.pipe.coin.check_collision(self.bird):
-                    self.score += 1
-
-                if not self.pipe.scored and self.pipe.x + self.pipe.width < self.bird.x:
-                    self.pipe.scored = True
-
-                if collision == "hit":
-                    self._draw_game_over()
-                    time.sleep(2)
-                    self.game_active = False
-
-                self.screen.fill(settings.WHITE)
-                self.bird.draw(self.screen)
-                self.pipe.draw(self.screen)
-                self.pipe.coin.draw(self.screen)
-                pygame.draw.rect(self.screen, (100, 100, 100), (0, settings.floor_y, settings.WIDTH, settings.floor_height))
-                score_text = settings.font.render(f"WYNIK: {self.score}", True, settings.BLUE)
-                self.screen.blit(score_text, (10, 10))
-            else:
-                self._draw_start_menu()
-
-                for event in pygame.event.get():
-                    if event.type == pygame.QUIT:
-                        running = False
-                    if event.type == pygame.KEYDOWN:
-                        if event.key == pygame.K_SPACE:
-                            self._reset_game()
-                            self.game_active = True
             pygame.display.update()
-
+            self.clock.tick(settings.FPS)
+        
 
 if __name__ == "__main__":
     game = Game()
-    game._run()
+    game.run()
