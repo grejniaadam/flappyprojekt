@@ -5,6 +5,7 @@ import time
 from strategies import StaticPipeStrategy, VerticalPipeStrategy, StaticCoinStrategy, VerticalCoinStrategy
 from exceptions import InvalidPipeConfigError
 from game_objects import Bird, Light_Bird, Heavy_bird, Random_Bird, Pipe, Coin
+from commands import JumpCommand
 
 class State(ABC):
     def __init__(self, game):
@@ -64,8 +65,8 @@ class PlayingState(State):
             if event.type == pygame.QUIT:
                 self.game.running = False
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE:
-                    self.game.bird.jump()
+                command = JumpCommand(self.game.bird)
+                command.execute()
 
     def update(self):
         self.game.bird.update(settings.floor_y)
