@@ -156,14 +156,14 @@ class Pipe(GameObject):
         self.coin = Coin(self.x + self.width // 2, coin_y, movement_strategy=coin_strategy)
 
     def draw(self, screen):
-        # GÓRNA rura (ciało)
+        # GÓRNA rura
         y = self.gap_y - Textures.PIPE_END.get_height()
         while y > -Textures.PIPE_BODY.get_height():
             screen.blit(Textures.PIPE_BODY, (self.x, y))
             y -= Textures.PIPE_BODY.get_height()
         screen.blit(Textures.PIPE_END_FLIPPED, (self.x, self.gap_y - Textures.PIPE_END.get_height()))
 
-        # DOLNA rura (ciało)
+        # DOLNA rura
         bottom_y = self.gap_y + self.gap_height
         y = bottom_y
         while y < settings.HEIGHT - settings.floor_height:

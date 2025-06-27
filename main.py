@@ -56,20 +56,6 @@ class Game:
 
     def change_state(self, new_state: State):
         self.state = new_state
-
-    def _draw_game_over(self):
-        """Metoda do 'rysowania' informacji po zakończeniu gry"""
-        self.screen.fill((settings.WHITE))
-
-        msg_if_bird_dead = settings.big_font.render("JANUSZ JEBNĄŁ W RURĘ!", True, (200, 0, 0))
-        end_score = settings.font.render(f"WYNIK: {self._score}", True, (0, 0, 0))
-
-        msg_rect = msg_if_bird_dead.get_rect(center=(settings.WIDTH // 2, 200))
-        score_rect = end_score.get_rect(center=(settings.WIDTH // 2, 250))
-
-        self.screen.blit(msg_if_bird_dead, msg_rect)
-        self.screen.blit(end_score, score_rect)
-        pygame.display.update()
  
     def _reset_game_logic(self):
         """Metoda do resetowania stanu gry"""
@@ -77,10 +63,10 @@ class Game:
 
         try:
             """Statyczne rury"""
-            #movement_pipe = StaticPipeStrategy()
+            movement_pipe = StaticPipeStrategy()
 
             """Ruchome rury"""
-            movement_pipe = VerticalPipeStrategy()
+            # movement_pipe = VerticalPipeStrategy()
 
             self.pipe = Pipe(settings.WIDTH, width=60, gap_height=150, speed=3, movement_strategy=movement_pipe)
  

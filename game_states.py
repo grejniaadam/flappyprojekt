@@ -43,7 +43,6 @@ class MenuState(State):
         pass
 
     def draw(self, screen):
-        #screen.fill(settings.WHITE)
         
         highScore = settings.font.render(f"REKORD: {self.game._high_score}", True, (0, 0, 0))
         title_rect = self.game.title.get_rect(center=(settings.WIDTH // 2, 150))
@@ -81,23 +80,50 @@ class PlayingState(State):
             self.game.pipes_passed += 1
 
         if collision == "hit":
-            # Mówimy GŁÓWNEJ grze, żeby zmieniła stan
             # TODO: W przyszłości zmienić na GameOverState
-            self.game.change_state(MenuState(self.game))
+            self.game.change_state(GameOverState(self.game))
 
     def draw(self, screen):
-        #screen.fill(settings.WHITE)
         
         self.game.bird.draw(screen)
         self.game.pipe.draw(screen)
         self.game.pipe.coin.draw(screen)
         
-        #pygame.draw.rect(screen, (100, 100, 100), (0, settings.floor_y, settings.WIDTH, settings.floor_height))
-        score_text = settings.font.render(f"WYNIK: {self.game.score}", True, settings.BLUE)
+        score_text = settings.font.render(f"Monety: {self.game.score}", True, settings.BLUE)
         screen.blit(score_text, (10, 10))
         
-        pipes_text = settings.font.render(f"RURY: {self.game.pipes_passed}", True, settings.BLUE)
+        pipes_text = settings.font.render(f"Rury: {self.game.pipes_passed}", True, settings.BLUE)
         pipes_text_rect = pipes_text.get_rect(topright=(settings.WIDTH - 10, 10))
         screen.blit(pipes_text, pipes_text_rect)
 
+
+class GameOverState(State):
+    def __init__(self, game):
+        super().__init__(game)
+        print("Koniec Gry")
+
+    def handle_events(self, events):
+        for event in events:
+            if event.type == pygame.QUIT:
+                self.game.running = False
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    self.game.change_state(MenuState(self.game))
+
+    def update(self):
+        pass
+
+    def draw(self, screen):
+        screen.fill(settings.WHITE)
+
+        msg_if_bird_dead = settings.big_font.render("JANUSZ JEBNĄŁ W RURĘ!", True, (200, 0, 0))
+        end_score = settings.font.render(f"WYNIK: {self.game._score}", True, (0, 0, 0))
+        back_to_menu_text = settings.font.render("SPACJA = POWRÓT DO MENU", True, settings.BLUE)
+
+        msg_rect = msg_if_bird_dead.get_rect(center=(settings.WIDTH // 2, 200))
+        score_rect = end_score.get_rect(center=(settings.WIDTH // 2, 250))
+        back_to_menu_rect = back_to_menu_text.get_rect(center=(settings.WIDTH // 2, 350))
         
+        screen.blit(msg_if_bird_dead, msg_rect)
+        screen.blit(end_score, score_rect)
+        screen.blit(back_to_menu_text, back_to_menu_rect)

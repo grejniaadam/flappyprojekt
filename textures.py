@@ -28,3 +28,4 @@ class Textures:
             pygame.image.load("assets/floor.png").convert_alpha(),
             (settings.WIDTH+1, 100)
         )
+        
