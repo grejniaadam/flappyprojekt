@@ -1,6 +1,7 @@
 import pygame
 import random
 import settings
+import math
 from strategies import PipeMovementStrategy, StaticCoinStrategy, VerticalCoinStrategy, CoinMovementStrategy
 from exceptions import InvalidPipeConfigError
 from textures import Textures
@@ -177,4 +178,19 @@ class Pipe(GameObject):
         if in_x_range and not in_gap:
             return "hit"
         return "clear"
-    
+
+class Background:
+    def __init__(self):
+        self.image = Textures.BACKGROUND
+        self.time = 0
+        self.base_x = 0
+        self.base_y = 0
+
+    def update(self):
+        #efekt bujania sie tla
+        self.time += 0.05  # tempo animacji
+        self.offset_x = math.sin(self.time * 0.8) * 5 + math.sin(self.time * 1.3) * 2
+        self.offset_y = math.cos(self.time * 0.6) * 3 + math.sin(self.time * 0.9) * 2
+
+    def draw(self, screen):
+        screen.blit(self.image, (self.base_x + self.offset_x, self.base_y + self.offset_y))

@@ -43,7 +43,7 @@ class MenuState(State):
         pass
 
     def draw(self, screen):
-        screen.fill(settings.WHITE)
+        #screen.fill(settings.WHITE)
         
         highScore = settings.font.render(f"REKORD: {self.game._high_score}", True, (0, 0, 0))
         title_rect = self.game.title.get_rect(center=(settings.WIDTH // 2, 150))
@@ -86,7 +86,7 @@ class PlayingState(State):
             self.game.change_state(MenuState(self.game))
 
     def draw(self, screen):
-        screen.fill(settings.WHITE)
+        #screen.fill(settings.WHITE)
         
         self.game.bird.draw(screen)
         self.game.pipe.draw(screen)

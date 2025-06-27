@@ -20,3 +20,7 @@ class Textures:
         cls.PIPE_END_FLIPPED = pygame.transform.flip(cls.PIPE_END, False, True)
         cls.COIN = pygame.transform.scale(coin_raw, (size/2, size/2))
         cls.BIRD = pygame.transform.scale(bird_raw, (size*1.1, size))
+        cls.BACKGROUND = pygame.transform.scale(
+            pygame.image.load("assets/background1.png").convert_alpha(),
+            (settings.WIDTH, settings.HEIGHT)
+        )
