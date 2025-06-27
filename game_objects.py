@@ -26,9 +26,12 @@ class Bird(GameObject):
         self.gravity = 0.3
         self.jump_strength = -5
         self.color = settings.BLUE
+        self.flap_sound = pygame.mixer.Sound("assets/flap.wav")
 
     def jump(self):
         self.velocity += self.jump_strength
+        self.flap_sound.play()
+        self.flap_sound.set_volume(0.3)
 
     def draw(self, screen):
         bird_image = Textures.BIRD
@@ -82,6 +85,7 @@ class Coin(GameObject):
         self.collected = False
         self.color = settings.YELLOW
         self.movement_strategy = movement_strategy
+        self.coin_sound = pygame.mixer.Sound("assets/coin.wav")
 
         if radius is None:
             self.radius = Textures.COIN.get_width() // 2
@@ -101,6 +105,7 @@ class Coin(GameObject):
         distance = ((self.x - bird.x) ** 2 + (self.y - bird.y) ** 2) ** 0.5
         if distance <= self.radius + bird.radius and not self.collected:
             self.collected = True
+            self.coin_sound.play()
             return True
         return False
 

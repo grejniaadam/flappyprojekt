@@ -15,6 +15,9 @@ class Game:
         # Inicjalizacja pygame i okna
         pygame.init()
         pygame.mixer.init()
+        pygame.mixer.music.load("assets/music.wav")
+        pygame.mixer.music.set_volume(0.2)
+        pygame.mixer.music.play(-1)
         self.screen = pygame.display.set_mode((settings.WIDTH, settings.HEIGHT))
         self.clock = pygame.time.Clock()
         Textures.load()
