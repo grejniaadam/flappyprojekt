@@ -92,8 +92,7 @@ class PlayingState(State):
         self.game.pipe.draw(screen)
         self.game.pipe.coin.draw(screen)
         
-        pygame.draw.rect(screen, (100, 100, 100), (0, settings.floor_y, settings.WIDTH, settings.floor_height))
-        
+        #pygame.draw.rect(screen, (100, 100, 100), (0, settings.floor_y, settings.WIDTH, settings.floor_height))
         score_text = settings.font.render(f"WYNIK: {self.game.score}", True, settings.BLUE)
         screen.blit(score_text, (10, 10))
         

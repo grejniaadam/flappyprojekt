@@ -2,7 +2,7 @@
 import pygame
 import time
 import settings
-from game_objects import Bird, Heavy_bird, Light_Bird, Random_Bird, Pipe, Background
+from game_objects import Bird, Heavy_bird, Light_Bird, Random_Bird, Pipe, Background, Floor
 from strategies import StaticCoinStrategy, VerticalCoinStrategy, StaticPipeStrategy, VerticalPipeStrategy
 from exceptions import InvalidPipeConfigError
 from game_states import State, MenuState, PlayingState
@@ -19,6 +19,7 @@ class Game:
         Textures.load()
         self.background = Background()
         pygame.display.set_caption("Flappy Janusz")
+        self.floor = Floor(speed = 3)
 
         # Inicjalizacja stanu gry
         self.running = True
@@ -97,6 +98,9 @@ class Game:
             self.background.update()
             self.background.draw(self.screen)
             self.state.draw(self.screen)
+            if isinstance(self.state, PlayingState):
+                self.floor.update()
+                self.floor.draw(self.screen)
 
             pygame.display.update()
             self.clock.tick(settings.FPS)

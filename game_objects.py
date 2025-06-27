@@ -194,3 +194,25 @@ class Background:
 
     def draw(self, screen):
         screen.blit(self.image, (self.base_x + self.offset_x, self.base_y + self.offset_y))
+
+class Floor:
+    def __init__(self, speed):
+        self.image = Textures.FLOOR
+        self.speed = speed
+        self.x1 = 0
+        self.x2 = settings.WIDTH
+
+    def update(self):
+        self.x1 -= self.speed
+        self.x2 -= self.speed
+
+        # Jeśli jedna z tekstur wyleci poza ekran, przesuń ją na prawo
+        if self.x1 <= -settings.WIDTH:
+            self.x1 = self.x2 + settings.WIDTH
+        if self.x2 <= -settings.WIDTH:
+            self.x2 = self.x1 + settings.WIDTH
+
+    def draw(self, screen):
+        y = settings.floor_y
+        screen.blit(self.image, (self.x1, y))
+        screen.blit(self.image, (self.x2, y))
