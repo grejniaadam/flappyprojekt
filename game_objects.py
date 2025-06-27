@@ -5,6 +5,7 @@ import math
 from strategies import PipeMovementStrategy, StaticCoinStrategy, VerticalCoinStrategy, CoinMovementStrategy
 from exceptions import InvalidPipeConfigError
 from textures import Textures
+import pygame.mixer
 
 class GameObject:
     def __init__(self, x=0, y=0):
@@ -106,6 +107,8 @@ class Coin(GameObject):
 class Pipe(GameObject):
     def __init__(self, x, width, gap_height, speed, movement_strategy: PipeMovementStrategy):
         super().__init__(x)
+        self.crash_sound = pygame.mixer.Sound("assets/crash.wav")
+
         if gap_height <= 0:
             raise InvalidPipeConfigError(f"Wysokość przerwy (gap_height) musi być dodatnia, a jest: {gap_height}")
         if gap_height >= settings.HEIGHT - settings.floor_height:
@@ -176,6 +179,7 @@ class Pipe(GameObject):
         if in_x_range and (abs(bird_top - self.gap_y) < 10 or abs(bird_bottom - (self.gap_y + self.gap_height)) < 10):
             return "bounce"
         if in_x_range and not in_gap:
+            self.crash_sound.play()
             return "hit"
         return "clear"
 

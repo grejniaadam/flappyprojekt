@@ -14,6 +14,7 @@ class Game:
         """Główne ustawienia gry"""
         # Inicjalizacja pygame i okna
         pygame.init()
+        pygame.mixer.init()
         self.screen = pygame.display.set_mode((settings.WIDTH, settings.HEIGHT))
         self.clock = pygame.time.Clock()
         Textures.load()
