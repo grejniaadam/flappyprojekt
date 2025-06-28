@@ -110,7 +110,12 @@ class Coin(GameObject):
         return False
 
 class Pipe(GameObject):
-    def __init__(self, x, width, gap_height, speed, movement_strategy: PipeMovementStrategy, coin_strategy: CoinMovementStrategy):
+    def __init__(self, x, width, gap_height, speed,
+                 movement_strategy: PipeMovementStrategy,
+                 coin_strategy: CoinMovementStrategy,
+                 pipe_img=None,
+                 pipe_end_img=None,
+                 pipe_end_flipped_img=None):
         super().__init__(x)
         self.crash_sound = pygame.mixer.Sound("assets/crash.wav")
 
@@ -125,6 +130,10 @@ class Pipe(GameObject):
         self.scored = False
         self.movement_strategy = movement_strategy
         self.coin_strategy = coin_strategy
+        from textures import Textures
+        self.pipe_img = pipe_img or Textures.PIPE_BODY
+        self.pipe_end_img = pipe_end_img or Textures.PIPE_END
+        self.pipe_end_flipped_img = pipe_end_flipped_img or Textures.PIPE_END_FLIPPED
 
         min_y = 100
         max_y = settings.HEIGHT - settings.floor_height - self.gap_height - 100
@@ -160,20 +169,19 @@ class Pipe(GameObject):
 
     def draw(self, screen):
         # GÓRNA rura
-        y = self.gap_y - Textures.PIPE_END.get_height()
-        while y > -Textures.PIPE_BODY.get_height():
-            screen.blit(Textures.PIPE_BODY, (self.x, y))
-            y -= Textures.PIPE_BODY.get_height()
-        screen.blit(Textures.PIPE_END_FLIPPED, (self.x, self.gap_y - Textures.PIPE_END.get_height()))
+        y = self.gap_y - self.pipe_end_img.get_height()
+        while y > -self.pipe_img.get_height():
+            screen.blit(self.pipe_img, (self.x, y))
+            y -= self.pipe_img.get_height()
+        screen.blit(self.pipe_end_flipped_img, (self.x, self.gap_y - self.pipe_end_img.get_height()))
 
         # DOLNA rura
         bottom_y = self.gap_y + self.gap_height
         y = bottom_y
         while y < settings.HEIGHT - settings.floor_height:
-            screen.blit(Textures.PIPE_BODY, (self.x, y))
-            y += Textures.PIPE_BODY.get_height()
-        screen.blit(Textures.PIPE_END, (self.x, bottom_y - 1))  # -1 żeby się ładnie stykało
-
+            screen.blit(self.pipe_img, (self.x, y))
+            y += self.pipe_img.get_height()
+        screen.blit(self.pipe_end_img, (self.x, bottom_y - 1))  # -1 żeby się ładnie stykało
 
     def check_collision(self, bird):
         bird_top = bird.y - bird.radius
@@ -196,15 +204,15 @@ class Pipe(GameObject):
         return cls(x, width=60, gap_height=220, speed=speed, movement_strategy=movement_strategy)
 
 class Background:
-    def __init__(self):
-        self.image = Textures.BACKGROUND
+    def __init__(self, image=None):
+        self.image = image if image else Textures.BACKGROUND
         self.time = 0
         self.base_x = 0
         self.base_y = 0
 
     def update(self):
-        #efekt bujania sie tla
-        self.time += 0.05  # tempo animacji
+        # efekt bujania się tła
+        self.time += 0.05
         self.offset_x = math.sin(self.time * 0.8) * 5 + math.sin(self.time * 1.3) * 2
         self.offset_y = math.cos(self.time * 0.6) * 3 + math.sin(self.time * 0.9) * 2
 

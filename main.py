@@ -25,7 +25,7 @@ class Game:
         Textures.load()
         self.background = Background()
         pygame.display.set_caption("Flappy Janusz")
-        self.floor = Floor(speed = 3)
+        # self.floor = Floor(speed = 3)
 
         # Inicjalizacja stanu gry
         self.running = True
@@ -65,25 +65,57 @@ class Game:
         self.score = 0
         self.pipes_passed = 0
 
+        if difficulty == 'medium':
+            self.background = Background(Textures.BACKGROUND2)
+        elif difficulty == 'hard':
+            self.background = Background(Textures.BACKGROUND3)
+        elif difficulty == 'random':
+            self.background = Background(Textures.BACKGROUND4)
+
+        else:
+            self.background = Background(Textures.BACKGROUND)
+
         try:
             if difficulty == 'easy':
                 self.bird = Light_Bird(50, settings.HEIGHT // 2, 15)
                 pipe_movement_strategy = StaticPipeStrategy()
                 coin_movement_strategy = StaticCoinStrategy()
                 self.pipe = Pipe(settings.WIDTH, width=80, gap_height=200, speed=2, movement_strategy=pipe_movement_strategy, coin_strategy=coin_movement_strategy)
-            
+                self.floor = Floor(speed=2)
             elif difficulty == 'medium':
                 self.bird = Bird(50, settings.HEIGHT // 2, 15)
                 pipe_movement_strategy = StaticPipeStrategy()
                 coin_movement_strategy = VerticalCoinStrategy(vertical_speed=1, move_range=25)
-                self.pipe = Pipe(settings.WIDTH, width=70, gap_height=170, speed=3, movement_strategy=pipe_movement_strategy, coin_strategy=coin_movement_strategy)
-            
+                self.pipe = Pipe(
+                    settings.WIDTH,
+                    width=70,
+                    gap_height=170,
+                    speed=3,
+                    movement_strategy=pipe_movement_strategy,
+                    coin_strategy=coin_movement_strategy,
+                    pipe_img=Textures.PIPE_BODY2,
+                    pipe_end_img=Textures.PIPE_END2,
+                    pipe_end_flipped_img=Textures.PIPE_END2_FLIPPED
+                )
+                self.floor = Floor(speed=3)
+                self.floor.image = Textures.FLOOR2
             elif difficulty == 'hard':
                 self.bird = Heavy_bird(50, settings.HEIGHT // 2, 15)
                 pipe_movement_strategy = VerticalPipeStrategy(vertical_speed=2, move_range=50)
                 coin_movement_strategy = VerticalCoinStrategy(vertical_speed=3, move_range=35)
-                self.pipe = Pipe(settings.WIDTH, width=60, gap_height=140, speed=4, movement_strategy=pipe_movement_strategy, coin_strategy=coin_movement_strategy)
-
+                self.pipe = Pipe(
+                    settings.WIDTH,
+                    width=70,
+                    gap_height=170,
+                    speed=3,
+                    movement_strategy=pipe_movement_strategy,
+                    coin_strategy=coin_movement_strategy,
+                    pipe_img=Textures.PIPE_BODY3,
+                    pipe_end_img=Textures.PIPE_END3,
+                    pipe_end_flipped_img=Textures.PIPE_END3_FLIPPED
+                )
+                self.floor = Floor(speed=4)
+                self.floor.image = Textures.FLOOR3
             # --- DODANA LOGIKA DLA RANDOM ---
             elif difficulty == 'random':
                 self.bird = Random_Bird(50, settings.HEIGHT // 2, 15)
@@ -102,8 +134,19 @@ class Game:
                 rand_width = random.randint(60, 90)
                 rand_gap = random.randint(150, 220)
                 rand_speed = random.randint(2, 5)
-                self.pipe = Pipe(settings.WIDTH, width=rand_width, gap_height=rand_gap, speed=rand_speed, movement_strategy=pipe_movement_strategy, coin_strategy=coin_movement_strategy)
-
+                self.pipe = Pipe(
+                    settings.WIDTH,
+                    width=70,
+                    gap_height=170,
+                    speed=3,
+                    movement_strategy=pipe_movement_strategy,
+                    coin_strategy=coin_movement_strategy,
+                    pipe_img=Textures.PIPE_BODY4,
+                    pipe_end_img=Textures.PIPE_END4,
+                    pipe_end_flipped_img=Textures.PIPE_END4_FLIPPED
+                )
+                self.floor = Floor(speed=rand_speed)
+                self.floor.image = Textures.FLOOR4
         except InvalidPipeConfigError as e:
             print(f"Błąd konfiguracji rur! {e}")
             print("Gra nie może zostać poprawnie uruchomiona.")
