@@ -7,6 +7,7 @@ from exceptions import InvalidPipeConfigError
 from game_objects import Bird, Light_Bird, Heavy_bird, Random_Bird, Pipe, Coin
 from commands import JumpCommand
 from textures import Textures
+from game_objects import Background
 
 
 def draw_text_with_shadow(screen, text, font, position, text_color, shadow_color=(0, 0, 0)):
@@ -40,6 +41,9 @@ class MenuState(State):
     """Menu główne gry z 4 przyciskami wyboru poziomu."""
     def __init__(self, game):
         super().__init__(game)
+
+        self.game.background = Background(Textures.BACKGROUND)
+
         button_width, button_height = 220, 55
         center_x = settings.WIDTH / 2
         start_y = 210

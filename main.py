@@ -25,7 +25,6 @@ class Game:
         Textures.load()
         self.background = Background()
         pygame.display.set_caption("Flappy Janusz")
-        # self.floor = Floor(speed = 3)
 
         # Inicjalizacja stanu gry
         self.running = True
@@ -37,7 +36,6 @@ class Game:
         self.bird = None
         self.pipe = None
         self.title = settings.big_font.render("FLAPPY JANUSZ", True, settings.BLACK)
-        # self.start_game_title = settings.font.render("SPACAJA = START", True, settings.BLUE)
 
         self.change_state(MenuState(self))
 
@@ -47,7 +45,6 @@ class Game:
     
     @score.setter
     def score(self, value):
-        # print(f"--- JESTEM W SETTERZE --- {value}")
         if value > 0:
             self._score = value
         else:
@@ -128,7 +125,7 @@ class Game:
                 )
                 self.floor = Floor(speed=4)
                 self.floor.image = Textures.FLOOR3
-            # --- DODANA LOGIKA DLA RANDOM ---
+
             elif difficulty == 'random':
                 self.bird = Random_Bird(50, settings.HEIGHT // 2, 15)
                 
