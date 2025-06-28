@@ -90,10 +90,13 @@ class MenuState(State):
         pass
 
     def draw(self, screen):
-        title_rect = self.game.title.get_rect(center=(settings.WIDTH // 2, 80))
-        shadow_pos = (title_rect.x + 3, title_rect.y + 3)
-        screen.blit(settings.big_font.render("FLAPPY JANUSZ", True, settings.BLACK), shadow_pos)
-        screen.blit(self.game.title, title_rect)
+        # title_rect = self.game.title.get_rect(center=(settings.WIDTH // 2, 80))
+        # shadow_pos = (title_rect.x + 3, title_rect.y + 3)
+        # screen.blit(settings.big_font.render("FLAPPY JANUSZ", True, settings.BLACK), shadow_pos)
+        # screen.blit(self.game.title, title_rect)
+        logo = Textures.LOGO
+        logo_rect = logo.get_rect(center=(settings.WIDTH // 2, 100))
+        screen.blit(logo, logo_rect)
         highScore = settings.font.render(f"PIPE REKORD: {self.game._high_score}", True, settings.BLACK)
         highScore_rect = highScore.get_rect(center=(settings.WIDTH // 2, 520))
         screen.blit(highScore, highScore_rect)
