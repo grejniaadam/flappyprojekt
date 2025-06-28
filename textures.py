@@ -35,6 +35,9 @@ class Textures:
     FLOOR3 = None
     FLOOR4 = None
     LOGO = None
+    BEST = None
+    MUTED = None
+    UNMUTED= None
     @classmethod
     def load(cls):
         # Ustawiamy jednolity rozmiar dla przycisków
@@ -72,7 +75,9 @@ class Textures:
         floor3_raw = pygame.image.load(os.path.join(settings.ASSETS_DIR, "floor3.png")).convert_alpha()
         floor4_raw = pygame.image.load(os.path.join(settings.ASSETS_DIR, "floor4.png")).convert_alpha()
         logo_raw = pygame.image.load(os.path.join(settings.ASSETS_DIR, "logo.png")).convert_alpha()
-
+        best_raw =  pygame.image.load(os.path.join(settings.ASSETS_DIR, "best.png")).convert_alpha()
+        unmuted_raw=pygame.image.load(os.path.join(settings.ASSETS_DIR, "unmuted.png")).convert_alpha()
+        muted_raw=pygame.image.load(os.path.join(settings.ASSETS_DIR, "muted.png")).convert_alpha()
         size = 50
         body_height = int(pipe_body_raw.get_height() * (size / pipe_body_raw.get_width()))
         end_height = int(pipe_end_raw.get_height() * (size / pipe_end_raw.get_width()))
@@ -100,3 +105,6 @@ class Textures:
         cls.BACKGROUND3 = pygame.transform.scale(background_3, (settings.WIDTH, settings.HEIGHT))
         cls.BACKGROUND4 = pygame.transform.scale(background_4, (settings.WIDTH, settings.HEIGHT))
         cls.LOGO = pygame.transform.scale(logo_raw, (300, 240))
+        cls.BEST = pygame.transform.scale(best_raw, (120, 90))
+        cls.MUTED = pygame.transform.scale(muted_raw, (40, 40))
+        cls.UNMUTED = pygame.transform.scale(unmuted_raw, (40, 40))

@@ -23,13 +23,13 @@ class Game:
         self.screen = pygame.display.set_mode((settings.WIDTH, settings.HEIGHT))
         self.clock = pygame.time.Clock()
         Textures.load()
-        self.background = Background()
+        self.background = Background(Textures.BACKGROUND)
         pygame.display.set_caption("Flappy Janusz")
 
         # Inicjalizacja stanu gry
         self.running = True
         self.state: State = None
-
+        self.muted = False
         self._high_score = 0
         self._score = 0
         self._pipes_passed = 0

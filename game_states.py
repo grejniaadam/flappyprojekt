@@ -42,8 +42,6 @@ class MenuState(State):
     def __init__(self, game):
         super().__init__(game)
 
-        self.game.background = Background(Textures.BACKGROUND)
-
         button_width, button_height = 220, 55
         center_x = settings.WIDTH / 2
         start_y = 210
@@ -67,6 +65,7 @@ class MenuState(State):
             {"image": Textures.BUTTON_HARD, "rect": rect_hard, "action": "start_hard"},
             {"image": Textures.BUTTON_RANDOM, "rect": rect_random, "action": "start_random"}
         ]
+        self.muted_icon_rect = pygame.Rect(settings.WIDTH - 55, settings.HEIGHT - 50, 40, 40)
 
     def handle_events(self, events):
         for event in events:
@@ -75,6 +74,11 @@ class MenuState(State):
             
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
+                    if event.button == 1 and self.muted_icon_rect.collidepoint(event.pos):
+                        self.game.muted = not self.game.muted
+                        pygame.mixer.music.set_volume(0.0 if self.game.muted else 0.01)
+                        return  # przerywamy, żeby nie kliknęło w przyciski
+
                     for button in self.buttons:
                         if button['rect'].collidepoint(event.pos):
                             if button['action'] == 'start_easy':
@@ -97,12 +101,22 @@ class MenuState(State):
         logo = Textures.LOGO
         logo_rect = logo.get_rect(center=(settings.WIDTH // 2, 100))
         screen.blit(logo, logo_rect)
-        highScore = settings.font.render(f"PIPE REKORD: {self.game._high_score}", True, settings.BLACK)
-        highScore_rect = highScore.get_rect(center=(settings.WIDTH // 2, 520))
-        screen.blit(highScore, highScore_rect)
+        # highScore = settings.font.render(f"PIPE REKORD: {self.game._high_score}", True, settings.BLACK)
+        # highScore_rect = highScore.get_rect(center=(settings.WIDTH // 2, 520))
+        # screen.blit(highScore, highScore_rect)
+        best_label_img = Textures.BEST
+        best_label_rect = best_label_img.get_rect(center=(settings.WIDTH // 2, 505))
+        screen.blit(best_label_img, best_label_rect)
+
+        score_text = settings.font.render(str(self.game._high_score), True, settings.GOLD)
+        score_rect = score_text.get_rect(center=(settings.WIDTH // 2, best_label_rect.bottom - 29))
+        screen.blit(score_text, score_rect)
+        icon = Textures.MUTED if self.game.muted else Textures.UNMUTED
+        screen.blit(icon, self.muted_icon_rect)
 
         for button in self.buttons:
             screen.blit(button["image"], button["rect"])
+
 
 class PlayingState(State):
     def __init__(self, game, difficulty):
