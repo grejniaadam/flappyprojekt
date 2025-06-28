@@ -6,7 +6,7 @@ WIDTH = 400
 HEIGHT = 600
 FPS = 60
 floor_height = 50
-floor_y = HEIGHT - floor_height
+floor_y = HEIGHT - floor_height #550
 
 
 # === KOLORY ===

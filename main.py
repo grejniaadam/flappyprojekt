@@ -33,10 +33,10 @@ class Game:
 
         self._high_score = 0
         self._score = 0
-        self.pipes_passed = 0
+        self._pipes_passed = 0
         self.bird = None
         self.pipe = None
-        self.title = settings.big_font.render("FLAPPY JANUSZ", True, settings.BLUE)
+        self.title = settings.big_font.render("FLAPPY JANUSZ", True, settings.BLACK)
         # self.start_game_title = settings.font.render("SPACAJA = START", True, settings.BLUE)
 
         self.change_state(MenuState(self))
@@ -55,6 +55,18 @@ class Game:
 
         if self._score > self._high_score:
             self._high_score = self._score
+
+    
+    @property
+    def pipes_passed(self):
+        return self._pipes_passed
+    
+    @pipes_passed.setter
+    def pipes_passed(self, value):
+        self._pipes_passed = value
+
+        if self._pipes_passed > self._high_score:
+            self._high_score = self._pipes_passed
 
     def change_state(self, new_state: State):
         self.state = new_state
@@ -134,6 +146,7 @@ class Game:
                 rand_width = random.randint(60, 90)
                 rand_gap = random.randint(150, 220)
                 rand_speed = random.randint(2, 5)
+
                 self.pipe = Pipe(
                     settings.WIDTH,
                     width=70,

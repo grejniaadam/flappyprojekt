@@ -8,6 +8,15 @@ from game_objects import Bird, Light_Bird, Heavy_bird, Random_Bird, Pipe, Coin
 from commands import JumpCommand
 from textures import Textures
 
+
+def draw_text_with_shadow(screen, text, font, position, text_color, shadow_color=(0, 0, 0)):
+    """Funkcja do rysowania tekstu z cieniem"""
+    shadow_surface = font.render(text, True, shadow_color)
+    text_surface = font.render(text, True, text_color)
+
+    screen.blit(shadow_surface, (position[0] + 2, position[1] + 2))
+    screen.blit(text_surface, position)
+
 class State(ABC):
     def __init__(self, game):
         self.game = game
@@ -78,8 +87,10 @@ class MenuState(State):
 
     def draw(self, screen):
         title_rect = self.game.title.get_rect(center=(settings.WIDTH // 2, 80))
+        shadow_pos = (title_rect.x + 3, title_rect.y + 3)
+        screen.blit(settings.big_font.render("FLAPPY JANUSZ", True, settings.BLACK), shadow_pos)
         screen.blit(self.game.title, title_rect)
-        highScore = settings.font.render(f"REKORD: {self.game._high_score}", True, settings.BLACK)
+        highScore = settings.font.render(f"PIPE REKORD: {self.game._high_score}", True, settings.BLACK)
         highScore_rect = highScore.get_rect(center=(settings.WIDTH // 2, 520))
         screen.blit(highScore, highScore_rect)
 
@@ -113,12 +124,12 @@ class PlayingState(State):
         
         if not self.game.pipe.scored and self.game.pipe.x + self.game.pipe.width < self.game.bird.x:
             self.game.pipe.scored = True
-            self.game.pipes_passed += 1
+            self.game.pipes_passed = self.game.pipes_passed + 1
 
         bird_top = self.game.bird.y - self.game.bird.radius
         bird_bottom = self.game.bird.y + self.game.bird.radius
 
-        if collision == "hit" or bird_bottom > settings.floor_y or bird_bottom < 0:
+        if collision == "hit" or bird_bottom > settings.floor_y or bird_top < 0:
             self.game.pipe.crash_sound.play()
             last_frame = self.game.screen.copy()
             self.game.change_state(GameOverState(self.game, self.difficulty, last_frame))
@@ -128,17 +139,16 @@ class PlayingState(State):
         self.game.bird.draw(screen)
         self.game.pipe.draw(screen)
         self.game.pipe.coin.draw(screen)
-        
-        score_text = settings.font.render(f"Coin: {self.game.score}", True, settings.BLUE)
-        screen.blit(score_text, (10, 10))
-        
-        pipes_text = settings.font.render(f"Pipe: {self.game.pipes_passed}", True, settings.BLUE)
-        pipes_text_rect = pipes_text.get_rect(topright=(settings.WIDTH - 10, 10))
-        screen.blit(pipes_text, pipes_text_rect)
+
+        draw_text_with_shadow(screen, f"Coin: {self.game.score}", settings.font, (10, 10), settings.WHITE)
+
+        pipes_surface = settings.font.render(f"Pipe: {self.game.pipes_passed}", True, settings.WHITE)
+        pipes_pos_x = settings.WIDTH - pipes_surface.get_width() - 10
+        draw_text_with_shadow(screen, f"Pipe: {self.game.pipes_passed}", settings.font, (pipes_pos_x, 10), settings.WHITE)
 
 
 class GameOverState(State):
-    """Ostateczna wersja ekranu końca gry z przyciskami RESET i MENU."""
+    """Ekran końca gry"""
     def __init__(self, game, last_played_difficulty, last_frame_surface):
         super().__init__(game)
         self.last_played_difficulty = last_played_difficulty
@@ -186,7 +196,7 @@ class GameOverState(State):
         game_over_rect = game_over_text.get_rect(center=(settings.WIDTH // 2, 150))
         screen.blit(game_over_text, game_over_rect)
 
-        score_text = settings.font.render(f"WYNIK: {self.game.score}", True, settings.WHITE)
+        score_text = settings.font.render(f"COIN SCORE: {self.game.score}", True, settings.WHITE)
         score_rect = score_text.get_rect(center=(settings.WIDTH // 2, 220))
         screen.blit(score_text, score_rect)
 
