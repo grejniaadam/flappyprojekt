@@ -38,17 +38,17 @@ class Bird(GameObject):
         bird_rect = bird_image.get_rect(center=(int(self.x), int(self.y)))
         screen.blit(bird_image, bird_rect)
 
-    def update(self, floor_y):
+    def update(self):
         self.velocity += self.gravity
         self.y += self.velocity
 
-        if self.y + self.radius > floor_y:
-            self.y = floor_y - self.radius
-            self.velocity = 0
+        # if self.y + self.radius > floor_y:
+        #     self.y = floor_y - self.radius
+        #     self.velocity = 0
     
-        if self.y - self.radius < 0:
-            self.y = self.radius
-            self.velocity = 0
+        # if self.y - self.radius < 0:
+        #     self.y = self.radius
+        #     self.velocity = 0
 
 class Heavy_bird(Bird):
     gravity = 0.5
@@ -110,7 +110,7 @@ class Coin(GameObject):
         return False
 
 class Pipe(GameObject):
-    def __init__(self, x, width, gap_height, speed, movement_strategy: PipeMovementStrategy):
+    def __init__(self, x, width, gap_height, speed, movement_strategy: PipeMovementStrategy, coin_strategy: CoinMovementStrategy):
         super().__init__(x)
         self.crash_sound = pygame.mixer.Sound("assets/crash.wav")
 
@@ -124,6 +124,8 @@ class Pipe(GameObject):
         self.speed = speed
         self.scored = False
         self.movement_strategy = movement_strategy
+        self.coin_strategy = coin_strategy
+
         min_y = 100
         max_y = settings.HEIGHT - settings.floor_height - self.gap_height - 100
         self.gap_y = random.randint(min_y, max_y)
@@ -147,13 +149,14 @@ class Pipe(GameObject):
 
     def _create_coin(self):
         coin_y = random.randint(self.gap_y + 40, self.gap_y + self.gap_height - 40)
+
         """Statyczna moneta"""
         #coin_strategy = StaticCoinStrategy()
 
         """Ruchoma moneta"""
         coin_strategy = VerticalCoinStrategy(vertical_speed=1, move_range=25)
 
-        self.coin = Coin(self.x + self.width // 2, coin_y, movement_strategy=coin_strategy)
+        self.coin = Coin(self.x + self.width // 2, coin_y, movement_strategy=self.coin_strategy)
 
     def draw(self, screen):
         # GÓRNA rura
@@ -187,6 +190,10 @@ class Pipe(GameObject):
             self.crash_sound.play()
             return "hit"
         return "clear"
+    
+    @classmethod
+    def create_easy_pipe(cls, x, speed, movement_strategy):
+        return cls(x, width=60, gap_height=220, speed=speed, movement_strategy=movement_strategy)
 
 class Background:
     def __init__(self):

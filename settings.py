@@ -1,4 +1,5 @@
 import pygame
+import os
 
 # === USTAWIENIE OKNA I GRY ===
 WIDTH = 400
@@ -24,3 +25,8 @@ BLACK = (0, 0, 0)
 pygame.font.init()
 font = pygame.font.SysFont("comicsans", 24)
 big_font = pygame.font.SysFont("comicsans", 30)
+
+# === ŚCIŻKA DO PLIKU SETTINGS ===
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+ASSETS_DIR = os.path.join(BASE_DIR, "assets")

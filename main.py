@@ -2,6 +2,8 @@
 import pygame
 import time
 import settings
+import random
+import os
 from game_objects import Bird, Heavy_bird, Light_Bird, Random_Bird, Pipe, Background, Floor
 from strategies import StaticCoinStrategy, VerticalCoinStrategy, StaticPipeStrategy, VerticalPipeStrategy
 from exceptions import InvalidPipeConfigError
@@ -15,8 +17,8 @@ class Game:
         # Inicjalizacja pygame i okna
         pygame.init()
         pygame.mixer.init()
-        pygame.mixer.music.load("assets/music.wav")
-        pygame.mixer.music.set_volume(0.2)
+        pygame.mixer.music.load(os.path.join(settings.ASSETS_DIR, "music.wav"))
+        pygame.mixer.music.set_volume(0.01)
         pygame.mixer.music.play(-1)
         self.screen = pygame.display.set_mode((settings.WIDTH, settings.HEIGHT))
         self.clock = pygame.time.Clock()
@@ -56,29 +58,57 @@ class Game:
 
     def change_state(self, new_state: State):
         self.state = new_state
- 
-    def _reset_game_logic(self):
-        """Metoda do resetowania stanu gry"""
-        self.bird = Bird(50, settings.HEIGHT // 2, 15)
 
-        try:
-            """Statyczne rury"""
-            movement_pipe = StaticPipeStrategy()
-
-            """Ruchome rury"""
-            # movement_pipe = VerticalPipeStrategy()
-
-            self.pipe = Pipe(settings.WIDTH, width=60, gap_height=150, speed=3, movement_strategy=movement_pipe)
- 
-        except InvalidPipeConfigError as e:
-            print(f"Błąd konfiguracji! {e}")
-            print("Gra nie może zostać poprawnie uruchomiona")
-            self.running = False
-
+    def _reset_game_logic(self, difficulty):
+        """Ostateczna wersja logiki gry z poziomem RANDOM."""
+        
         self.score = 0
         self.pipes_passed = 0
-        
 
+        try:
+            if difficulty == 'easy':
+                self.bird = Light_Bird(50, settings.HEIGHT // 2, 15)
+                pipe_movement_strategy = StaticPipeStrategy()
+                coin_movement_strategy = StaticCoinStrategy()
+                self.pipe = Pipe(settings.WIDTH, width=80, gap_height=200, speed=2, movement_strategy=pipe_movement_strategy, coin_strategy=coin_movement_strategy)
+            
+            elif difficulty == 'medium':
+                self.bird = Bird(50, settings.HEIGHT // 2, 15)
+                pipe_movement_strategy = StaticPipeStrategy()
+                coin_movement_strategy = VerticalCoinStrategy(vertical_speed=1, move_range=25)
+                self.pipe = Pipe(settings.WIDTH, width=70, gap_height=170, speed=3, movement_strategy=pipe_movement_strategy, coin_strategy=coin_movement_strategy)
+            
+            elif difficulty == 'hard':
+                self.bird = Heavy_bird(50, settings.HEIGHT // 2, 15)
+                pipe_movement_strategy = VerticalPipeStrategy(vertical_speed=2, move_range=50)
+                coin_movement_strategy = VerticalCoinStrategy(vertical_speed=3, move_range=35)
+                self.pipe = Pipe(settings.WIDTH, width=60, gap_height=140, speed=4, movement_strategy=pipe_movement_strategy, coin_strategy=coin_movement_strategy)
+
+            # --- DODANA LOGIKA DLA RANDOM ---
+            elif difficulty == 'random':
+                self.bird = Random_Bird(50, settings.HEIGHT // 2, 15)
+                
+                if random.choice([True, False]):
+                    pipe_movement_strategy = StaticPipeStrategy()
+                else:
+                    pipe_movement_strategy = VerticalPipeStrategy(vertical_speed=random.randint(1, 3), move_range=random.randint(30, 60))
+
+                if random.choice([True, False]):
+                    coin_movement_strategy = StaticCoinStrategy()
+                else:
+                    coin_movement_strategy = VerticalCoinStrategy(vertical_speed=random.randint(2, 4), move_range=random.randint(25, 40))
+
+
+                rand_width = random.randint(60, 90)
+                rand_gap = random.randint(150, 220)
+                rand_speed = random.randint(2, 5)
+                self.pipe = Pipe(settings.WIDTH, width=rand_width, gap_height=rand_gap, speed=rand_speed, movement_strategy=pipe_movement_strategy, coin_strategy=coin_movement_strategy)
+
+        except InvalidPipeConfigError as e:
+            print(f"Błąd konfiguracji rur! {e}")
+            print("Gra nie może zostać poprawnie uruchomiona.")
+            self.running = False
+    
     def run(self):
         while self.running:
             events = pygame.event.get()
