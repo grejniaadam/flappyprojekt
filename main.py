@@ -37,7 +37,7 @@ class Game:
         self.bird = None
         self.pipe = None
         self.title = settings.big_font.render("FLAPPY JANUSZ", True, settings.BLUE)
-        self.start_game_title = settings.font.render("SPACAJA = START", True, settings.BLUE)
+        # self.start_game_title = settings.font.render("SPACAJA = START", True, settings.BLUE)
 
         self.change_state(MenuState(self))
 

@@ -3,11 +3,15 @@ import settings
 import os
 
 class Textures:
-    BUTTON_START = None
+    # Definiujemy tylko te przyciski, których faktycznie używamy
     BUTTON_EASY = None
     BUTTON_MEDIUM = None
     BUTTON_HARD = None
     BUTTON_RANDOM = None
+    BUTTON_MENU = None
+    BUTTON_RESTART = None
+    
+    # Pozostałe atrybuty
     PIPE_BODY = None
     PIPE_END = None
     PIPE_END_FLIPPED = None
@@ -18,23 +22,21 @@ class Textures:
 
     @classmethod
     def load(cls):
-        # Wczytujemy pliki, podając tylko ich NAZWĘ, a nie całą ścieżkę z "assets/"
+        # Ustawiamy jednolity rozmiar dla przycisków
         button_size = (220, 55)
-        try:
-            # Poprawione ścieżki
-            # cls.BUTTON_START = pygame.transform.scale(pygame.image.load(os.path.join(settings.ASSETS_DIR, "start.png")).convert_alpha(), button_size)
-            cls.BUTTON_EASY = pygame.transform.scale(pygame.image.load(os.path.join(settings.ASSETS_DIR, "easy.png")).convert_alpha(), button_size)
-            cls.BUTTON_MEDIUM = pygame.transform.scale(pygame.image.load(os.path.join(settings.ASSETS_DIR, "medium.png")).convert_alpha(), button_size)
-            cls.BUTTON_HARD = pygame.transform.scale(pygame.image.load(os.path.join(settings.ASSETS_DIR, "hard.png")).convert_alpha(), button_size)
-            cls.BUTTON_RANDOM = pygame.transform.scale(pygame.image.load(os.path.join(settings.ASSETS_DIR, "random.png")).convert_alpha(), button_size)
-            print("INFO: Wszystkie nowe grafiki przycisków załadowane pomyślnie.")
-        except pygame.error as e:
-            print(f"BŁĄD: Nie udało się wczytać którejś z grafik przycisków! Sprawdź nazwy plików w folderze 'assets'.")
-            print(f"Szczegóły błędu: {e}")
-            fallback = pygame.Surface(button_size)
-            cls.BUTTON_START, cls.BUTTON_EASY, cls.BUTTON_MEDIUM, cls.BUTTON_HARD, cls.BUTTON_RANDOM = [fallback] * 5
 
-        # Reszta tekstur - również poprawione ścieżki
+        # --- WCZYTYWANIE NOWYCH PRZYCISKÓW ---
+        # Menu główne
+        cls.BUTTON_EASY = pygame.transform.scale(pygame.image.load(os.path.join(settings.ASSETS_DIR, "easy.png")).convert_alpha(), button_size)
+        cls.BUTTON_MEDIUM = pygame.transform.scale(pygame.image.load(os.path.join(settings.ASSETS_DIR, "medium.png")).convert_alpha(), button_size)
+        cls.BUTTON_HARD = pygame.transform.scale(pygame.image.load(os.path.join(settings.ASSETS_DIR, "hard.png")).convert_alpha(), button_size)
+        cls.BUTTON_RANDOM = pygame.transform.scale(pygame.image.load(os.path.join(settings.ASSETS_DIR, "random.png")).convert_alpha(), button_size)
+
+        # Menu końca gry
+        cls.BUTTON_MENU = pygame.transform.scale(pygame.image.load(os.path.join(settings.ASSETS_DIR, "button_menu.png")).convert_alpha(), button_size)
+        cls.BUTTON_RESTART = pygame.transform.scale(pygame.image.load(os.path.join(settings.ASSETS_DIR, "button_reset.png")).convert_alpha(), button_size)
+        
+        # Reszta zasobów gry
         pipe_body_raw = pygame.image.load(os.path.join(settings.ASSETS_DIR, "pipe.png")).convert_alpha()
         pipe_end_raw = pygame.image.load(os.path.join(settings.ASSETS_DIR, "pipe_end.png")).convert_alpha()
         coin_raw = pygame.image.load(os.path.join(settings.ASSETS_DIR, "coin.png")).convert_alpha()

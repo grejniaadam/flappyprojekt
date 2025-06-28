@@ -28,31 +28,27 @@ class State(ABC):
         pass
 
 class MenuState(State):
-    """Ostateczne, działające menu gry z 5 nowymi przyciskami."""
+    """Menu główne gry z 4 przyciskami wyboru poziomu."""
     def __init__(self, game):
         super().__init__(game)
         button_width, button_height = 220, 55
         center_x = settings.WIDTH / 2
-
-        # Definiujemy 5 prostokątów dla naszych przycisków
-        rect_start = pygame.Rect(0, 0, button_width, button_height)
-        rect_start.center = (center_x, 180)
+        start_y = 210
+        gap_y = 70
 
         rect_easy = pygame.Rect(0, 0, button_width, button_height)
-        rect_easy.center = (center_x, 240)
+        rect_easy.center = (center_x, start_y)
 
         rect_medium = pygame.Rect(0, 0, button_width, button_height)
-        rect_medium.center = (center_x, 300)
+        rect_medium.center = (center_x, start_y + gap_y)
 
         rect_hard = pygame.Rect(0, 0, button_width, button_height)
-        rect_hard.center = (center_x, 360)
+        rect_hard.center = (center_x, start_y + 2 * gap_y)
         
         rect_random = pygame.Rect(0, 0, button_width, button_height)
-        rect_random.center = (center_x, 420)
+        rect_random.center = (center_x, start_y + 3 * gap_y)
 
-        # Przypisujemy Twoje nowe grafiki i akcje do każdego przycisku
         self.buttons = [
-            # {"image": Textures.BUTTON_START, "rect": rect_start, "action": "start_medium"}, # START domyślnie uruchamia poziom średni
             {"image": Textures.BUTTON_EASY, "rect": rect_easy, "action": "start_easy"},
             {"image": Textures.BUTTON_MEDIUM, "rect": rect_medium, "action": "start_medium"},
             {"image": Textures.BUTTON_HARD, "rect": rect_hard, "action": "start_hard"},
@@ -81,14 +77,12 @@ class MenuState(State):
         pass
 
     def draw(self, screen):
-        # Rysowanie tytułu i rekordu
         title_rect = self.game.title.get_rect(center=(settings.WIDTH // 2, 80))
         screen.blit(self.game.title, title_rect)
         highScore = settings.font.render(f"REKORD: {self.game._high_score}", True, settings.BLACK)
         highScore_rect = highScore.get_rect(center=(settings.WIDTH // 2, 520))
         screen.blit(highScore, highScore_rect)
 
-        # Rysowanie gotowych przycisków
         for button in self.buttons:
             screen.blit(button["image"], button["rect"])
 
@@ -102,12 +96,14 @@ class PlayingState(State):
         for event in events:
             if event.type == pygame.QUIT:
                 self.game.running = False
-            if event.type == pygame.KEYDOWN:
+
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE or \
+                event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                
                 command = JumpCommand(self.game.bird)
                 command.execute()
 
     def update(self):
-        # self.game.bird.update(settings.floor_y)
         self.game.bird.update()
         self.game.pipe.update()
         
@@ -122,9 +118,10 @@ class PlayingState(State):
         bird_top = self.game.bird.y - self.game.bird.radius
         bird_bottom = self.game.bird.y + self.game.bird.radius
 
-        if collision == "hit" or bird_bottom > settings.floor_y or bird_bottom <- 0:
+        if collision == "hit" or bird_bottom > settings.floor_y or bird_bottom < 0:
             self.game.pipe.crash_sound.play()
-            self.game.change_state(GameOverState(self.game))
+            last_frame = self.game.screen.copy()
+            self.game.change_state(GameOverState(self.game, self.difficulty, last_frame))
 
     def draw(self, screen):
         
@@ -132,41 +129,66 @@ class PlayingState(State):
         self.game.pipe.draw(screen)
         self.game.pipe.coin.draw(screen)
         
-        score_text = settings.font.render(f"Monety: {self.game.score}", True, settings.BLUE)
+        score_text = settings.font.render(f"Coin: {self.game.score}", True, settings.BLUE)
         screen.blit(score_text, (10, 10))
         
-        pipes_text = settings.font.render(f"Rury: {self.game.pipes_passed}", True, settings.BLUE)
+        pipes_text = settings.font.render(f"Pipe: {self.game.pipes_passed}", True, settings.BLUE)
         pipes_text_rect = pipes_text.get_rect(topright=(settings.WIDTH - 10, 10))
         screen.blit(pipes_text, pipes_text_rect)
 
 
 class GameOverState(State):
-    def __init__(self, game):
+    """Ostateczna wersja ekranu końca gry z przyciskami RESET i MENU."""
+    def __init__(self, game, last_played_difficulty, last_frame_surface):
         super().__init__(game)
-        print("Koniec Gry")
+        self.last_played_difficulty = last_played_difficulty
+        self.background_surface = last_frame_surface
+
+        self.overlay = pygame.Surface((settings.WIDTH, settings.HEIGHT), pygame.SRCALPHA)
+        self.overlay.fill((0, 0, 0, 128)) 
+
+        button_width, button_height = 220, 55
+        center_x = settings.WIDTH / 2
+        
+        rect_restart = pygame.Rect(0, 0, button_width, button_height)
+        rect_restart.center = (center_x, 300)
+
+        rect_menu = pygame.Rect(0, 0, button_width, button_height)
+        rect_menu.center = (center_x, 370)
+
+        self.buttons = [
+            {"image": Textures.BUTTON_RESTART, "rect": rect_restart, "action": "restart"},
+            {"image": Textures.BUTTON_MENU, "rect": rect_menu, "action": "menu"}
+        ]
 
     def handle_events(self, events):
         for event in events:
             if event.type == pygame.QUIT:
                 self.game.running = False
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE:
-                    self.game.change_state(MenuState(self.game))
+            
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    for button in self.buttons:
+                        if button['rect'].collidepoint(event.pos):
+                            if button['action'] == 'restart':
+                                self.game.change_state(PlayingState(self.game, self.last_played_difficulty))
+                            elif button['action'] == 'menu':
+                                self.game.change_state(MenuState(self.game))
 
     def update(self):
         pass
 
     def draw(self, screen):
-        screen.fill(settings.WHITE)
+        screen.blit(self.background_surface, (0,0))
+        screen.blit(self.overlay, (0,0))
 
-        msg_if_bird_dead = settings.big_font.render("JANUSZ JEBNĄŁ W RURĘ!", True, (200, 0, 0))
-        end_score = settings.font.render(f"WYNIK: {self.game._score}", True, (0, 0, 0))
-        back_to_menu_text = settings.font.render("SPACJA = POWRÓT DO MENU", True, settings.BLUE)
+        game_over_text = settings.big_font.render("GAME OVER", True, settings.WHITE)
+        game_over_rect = game_over_text.get_rect(center=(settings.WIDTH // 2, 150))
+        screen.blit(game_over_text, game_over_rect)
 
-        msg_rect = msg_if_bird_dead.get_rect(center=(settings.WIDTH // 2, 200))
-        score_rect = end_score.get_rect(center=(settings.WIDTH // 2, 250))
-        back_to_menu_rect = back_to_menu_text.get_rect(center=(settings.WIDTH // 2, 350))
-        
-        screen.blit(msg_if_bird_dead, msg_rect)
-        screen.blit(end_score, score_rect)
-        screen.blit(back_to_menu_text, back_to_menu_rect)
+        score_text = settings.font.render(f"WYNIK: {self.game.score}", True, settings.WHITE)
+        score_rect = score_text.get_rect(center=(settings.WIDTH // 2, 220))
+        screen.blit(score_text, score_rect)
+
+        for button in self.buttons:
+            screen.blit(button["image"], button["rect"])

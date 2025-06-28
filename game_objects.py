@@ -154,7 +154,7 @@ class Pipe(GameObject):
         #coin_strategy = StaticCoinStrategy()
 
         """Ruchoma moneta"""
-        coin_strategy = VerticalCoinStrategy(vertical_speed=1, move_range=25)
+        # coin_strategy = VerticalCoinStrategy(vertical_speed=1, move_range=25)
 
         self.coin = Coin(self.x + self.width // 2, coin_y, movement_strategy=self.coin_strategy)
 
