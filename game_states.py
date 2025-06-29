@@ -1,14 +1,11 @@
 from abc import ABC, abstractmethod
 import settings
 import pygame
-import time
-from strategies import StaticPipeStrategy, VerticalPipeStrategy, StaticCoinStrategy, VerticalCoinStrategy
-from exceptions import InvalidPipeConfigError
-from game_objects import Bird, Light_Bird, Heavy_bird, Random_Bird, Pipe, Coin
 from commands import JumpCommand
 from textures import Textures
-from game_objects import Background
 
+""" Plik zarządzający stanem gry - implementacja wzorca State
+    Definuje stany gry - Menu, Gra, Koniec gry. Zarząda też logiką każdego z nich """
 
 def draw_text_with_shadow(screen, text, font, position, text_color, shadow_color=(0, 0, 0)):
     """Funkcja do rysowania tekstu z cieniem"""
@@ -19,6 +16,7 @@ def draw_text_with_shadow(screen, text, font, position, text_color, shadow_color
     screen.blit(text_surface, position)
 
 class State(ABC):
+    """Abstrakcyjna klasa bazowa dla wszystkich stanów gry"""
     def __init__(self, game):
         self.game = game
 
@@ -68,6 +66,7 @@ class MenuState(State):
         self.muted_icon_rect = pygame.Rect(settings.WIDTH - 55, settings.HEIGHT - 50, 40, 40)
 
     def handle_events(self, events):
+        """Metoda obsługująca kliknięcia przycisków w menu"""
         for event in events:
             if event.type == pygame.QUIT:
                 self.game.running = False
@@ -94,16 +93,10 @@ class MenuState(State):
         pass
 
     def draw(self, screen):
-        # title_rect = self.game.title.get_rect(center=(settings.WIDTH // 2, 80))
-        # shadow_pos = (title_rect.x + 3, title_rect.y + 3)
-        # screen.blit(settings.big_font.render("FLAPPY JANUSZ", True, settings.BLACK), shadow_pos)
-        # screen.blit(self.game.title, title_rect)
+        """Rysuje wszystkie elementy interfejsu"""
         logo = Textures.LOGO
         logo_rect = logo.get_rect(center=(settings.WIDTH // 2, 100))
         screen.blit(logo, logo_rect)
-        # highScore = settings.font.render(f"PIPE REKORD: {self.game._high_score}", True, settings.BLACK)
-        # highScore_rect = highScore.get_rect(center=(settings.WIDTH // 2, 520))
-        # screen.blit(highScore, highScore_rect)
         best_label_img = Textures.BEST
         best_label_rect = best_label_img.get_rect(center=(settings.WIDTH // 2, 505))
         screen.blit(best_label_img, best_label_rect)
@@ -119,12 +112,14 @@ class MenuState(State):
 
 
 class PlayingState(State):
+    """Klasa reprezentująca aktywną rozrywkę"""
     def __init__(self, game, difficulty):
         super().__init__(game)
         self.difficulty = difficulty
         self.game._reset_game_logic(self.difficulty)
 
     def handle_events(self, events):
+        """Obsługa sterowania ptakiem - mysz lub spcaja"""
         for event in events:
             if event.type == pygame.QUIT:
                 self.game.running = False
@@ -136,6 +131,7 @@ class PlayingState(State):
                 command.execute()
 
     def update(self):
+        """Aktualizuje wszystkie obiekty w grze i sprawdza kolizję"""
         self.game.bird.update()
         self.game.pipe.update()
         
@@ -156,7 +152,7 @@ class PlayingState(State):
             self.game.change_state(GameOverState(self.game, self.difficulty, last_frame))
 
     def draw(self, screen):
-        
+        """Rysuje wszystkie elementy rozgrywki - ptak, rura, monety i wyniki"""
         self.game.bird.draw(screen)
         self.game.pipe.draw(screen)
         self.game.pipe.coin.draw(screen)
@@ -169,7 +165,7 @@ class PlayingState(State):
 
 
 class GameOverState(State):
-    """Ekran końca gry"""
+    """Klasa reprezentująca ekran końca gry"""
     def __init__(self, game, last_played_difficulty, last_frame_surface):
         super().__init__(game)
         self.last_played_difficulty = last_played_difficulty
@@ -193,6 +189,7 @@ class GameOverState(State):
         ]
 
     def handle_events(self, events):
+        """Obsługa klinięć w menu końca gry - menu - reset"""
         for event in events:
             if event.type == pygame.QUIT:
                 self.game.running = False
@@ -210,6 +207,7 @@ class GameOverState(State):
         pass
 
     def draw(self, screen):
+        """Rysuje ostatnią klatkę gry"""
         screen.blit(self.background_surface, (0,0))
         screen.blit(self.overlay, (0,0))
 

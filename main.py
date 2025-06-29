@@ -1,6 +1,4 @@
-# Plik: main.py
 import pygame
-import time
 import settings
 import random
 import os
@@ -10,11 +8,16 @@ from exceptions import InvalidPipeConfigError
 from game_states import State, MenuState, PlayingState
 from textures import Textures
 
-# Klasa Game - główna klasa
+""" Klasa Game - główna klasa
+    Klasa Game jest centrum dowodzenia grą. Zarządza główną pęltlą
+    stanem gry, ogólną logiką - punktacja
+    Użycie klas """
+
 class Game:
     def __init__(self):
-        """Główne ustawienia gry"""
-        # Inicjalizacja pygame i okna
+        """Główne ustawienia gry i inicjalizacja zasobów"""
+
+        # Inicjalizacja pygame, okna i dźwięków
         pygame.init()
         pygame.mixer.init()
         pygame.mixer.music.load(os.path.join(settings.ASSETS_DIR, "music.wav"))
@@ -22,11 +25,14 @@ class Game:
         pygame.mixer.music.play(-1)
         self.screen = pygame.display.set_mode((settings.WIDTH, settings.HEIGHT))
         self.clock = pygame.time.Clock()
+
+        # Jednorazowe wczytanie wszystkich tekstur przy starcie gry
         Textures.load()
+
         self.background = Background(Textures.BACKGROUND)
         pygame.display.set_caption("Flappy Janusz")
 
-        # Inicjalizacja stanu gry
+        # Inicjalizacja atrybutów i stanu gry
         self.running = True
         self.state: State = None
         self.muted = False
@@ -37,14 +43,21 @@ class Game:
         self.pipe = None
         self.title = settings.big_font.render("FLAPPY JANUSZ", True, settings.BLACK)
 
+        # Ustawienie początkowego stanu gry na Menu główne
         self.change_state(MenuState(self))
 
+
+    # Użycie enkapsulacji - gettery i settery
+    # Oddzielamy dostęp do atrybutów, pozwalacją na dodanie
+    # dodatkowej logiki podczas ich odczytu lub zapisu
     @property
     def score(self):
+        """Getter dla wyniku monet"""
         return self._score
     
     @score.setter
     def score(self, value):
+        """Setter dla wyniku monet. Pilnuje by wynik nie był ujemny""" # Na wszelki wypadek, błąd programisty itp
         if value > 0:
             self._score = value
         else:
@@ -56,24 +69,27 @@ class Game:
     
     @property
     def pipes_passed(self):
+        """Getter dla wyniku ominiętych rur"""
         return self._pipes_passed
     
     @pipes_passed.setter
     def pipes_passed(self, value):
+        """Setter dla wyniku ominiętych rur. Aktualizuje wynik jeśli został pobity"""
         self._pipes_passed = value
 
         if self._pipes_passed > self._high_score:
             self._high_score = self._pipes_passed
 
     def change_state(self, new_state: State):
+        """Metoda do przechodzenia między stanami gry"""
         self.state = new_state
 
     def _reset_game_logic(self, difficulty):
-        """Ostateczna wersja logiki gry z poziomem RANDOM."""
-        
+        """Resetuje i konfiguruje logikę gry na podstawie wybranego poziomu gry"""
         self.score = 0
         self.pipes_passed = 0
 
+        #Wybór tła zależnie od poziomu trudności
         if difficulty == 'medium':
             self.background = Background(Textures.BACKGROUND2)
         elif difficulty == 'hard':
@@ -84,6 +100,8 @@ class Game:
         else:
             self.background = Background(Textures.BACKGROUND)
 
+        # Konfiguracja ptaka, rur i monet dla każdego poziomu
+        # Użycie własnego wyjątku InvalidPipeConfigError
         try:
             if difficulty == 'easy':
                 self.bird = Light_Bird(50, settings.HEIGHT // 2, 15)
@@ -139,9 +157,6 @@ class Game:
                 else:
                     coin_movement_strategy = VerticalCoinStrategy(vertical_speed=random.randint(2, 4), move_range=random.randint(25, 40))
 
-
-                rand_width = random.randint(60, 90)
-                rand_gap = random.randint(150, 220)
                 rand_speed = random.randint(2, 5)
 
                 self.pipe = Pipe(
@@ -157,28 +172,37 @@ class Game:
                 )
                 self.floor = Floor(speed=rand_speed)
                 self.floor.image = Textures.FLOOR4
+
+        # Własny wyjątek rzucany w momencie próby utworzenia rury
+        # z nielogicznymi (np. ujemnymi) wartościami
         except InvalidPipeConfigError as e:
             print(f"Błąd konfiguracji rur! {e}")
             print("Gra nie może zostać poprawnie uruchomiona.")
             self.running = False
     
     def run(self):
+        """Główna pętla gry"""
         while self.running:
-            events = pygame.event.get()
+            events = pygame.event.get() # Pobranie zdarzeń o kliknięciu myszki lub klawisza
 
-            self.state.handle_events(events)
+            # Przekazanie kontroli do aktualnego stanu gry
+            self.state.handle_events(events) 
             self.state.update()
+        
             self.background.update()
             self.background.draw(self.screen)
             self.state.draw(self.screen)
-            if isinstance(self.state, PlayingState):
+
+            # Rysowanie podłogi tylko w stanie gry
+            if isinstance(self.state, PlayingState): 
                 self.floor.update()
                 self.floor.draw(self.screen)
 
+            # Aktualizacja ekranu
             pygame.display.update()
             self.clock.tick(settings.FPS)
         
-
+"""Uruchomienie gry"""
 if __name__ == "__main__":
     game = Game()
     game.run()
