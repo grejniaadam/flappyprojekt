@@ -32,7 +32,7 @@ class Bird(GameObject):
         self.gravity = 0.3
         self.jump_strength = -5
         self.color = settings.BLUE
-        self.flap_sound = pygame.mixer.Sound("assets/flap.wav")
+        self.flap_sound = pygame.mixer.Sound(os.path.join(settings.ASSETS_DIR, "flap.wav"))
 
     def jump(self):
         """Metoda wykonująca skok ptaka"""
@@ -91,7 +91,7 @@ class Coin(GameObject):
         self.collected = False
         self.color = settings.YELLOW
         self.movement_strategy = movement_strategy
-        self.coin_sound = pygame.mixer.Sound("assets/coin.wav")
+        self.coin_sound = pygame.mixer.Sound(os.path.join(settings.ASSETS_DIR, "coin.wav"))
 
         if radius is None:
             self.radius = Textures.COIN.get_width() // 2
@@ -127,7 +127,6 @@ class Pipe(GameObject):
                  pipe_end_img=None,
                  pipe_end_flipped_img=None):
         super().__init__(x)
-        # self.crash_sound = pygame.mixer.Sound("assets/crash.wav")
         self.crash_sound = pygame.mixer.Sound(os.path.join(settings.ASSETS_DIR, "crash.wav"))
 
         if gap_height <= 0:
@@ -208,11 +207,13 @@ class Pipe(GameObject):
             return "hit"
         return "clear"
     
-    """Alternatywny konstruktor do tworzenie predefiniowanej 'łatwej' rury"""
-    # Tylko przykład - tutaj tworzy rurę bez tekstur i strategii
     @classmethod
-    def create_easy_pipe(cls, x, speed, movement_strategy):
-        return cls(x, width=60, gap_height=220, speed=speed, movement_strategy=movement_strategy)
+    def create_easy_pipe(cls, movement_strategy, coin_strategy):
+        """Alternatywny konstruktor do tworzenia predefiniowanej 'łatwej' rury."""
+        # Wywołujemy główny konstruktor __init__, przekazując wszystkie potrzebne strategie
+        return cls(x=settings.WIDTH, width=80, gap_height=200, 
+                   speed=2,movement_strategy=movement_strategy,
+                   coin_strategy=coin_strategy)
 
 class Background:
     """Klasa zarządzająca tłem gry"""

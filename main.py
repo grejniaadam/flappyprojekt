@@ -107,7 +107,7 @@ class Game:
                 self.bird = Light_Bird(50, settings.HEIGHT // 2, 15)
                 pipe_movement_strategy = StaticPipeStrategy()
                 coin_movement_strategy = StaticCoinStrategy()
-                self.pipe = Pipe(settings.WIDTH, width=80, gap_height=200, speed=2, movement_strategy=pipe_movement_strategy, coin_strategy=coin_movement_strategy)
+                self.pipe = Pipe.create_easy_pipe(movement_strategy=pipe_movement_strategy, coin_strategy=coin_movement_strategy)
                 self.floor = Floor(speed=2)
             elif difficulty == 'medium':
                 self.bird = Bird(50, settings.HEIGHT // 2, 15)
@@ -186,6 +186,7 @@ class Game:
             events = pygame.event.get() # Pobranie zdarzeń o kliknięciu myszki lub klawisza
 
             # Przekazanie kontroli do aktualnego stanu gry
+            # Polimorficzne wywołania
             self.state.handle_events(events) 
             self.state.update()
         
