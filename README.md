@@ -27,3 +27,4 @@ Projekt gry Flappy Janusz - Studia/Obiektówka
    - Uruchamiamy ją z pomoca terminalu. Jeżeli macie aktywne środowisko 
      wpisujecie w terminalu: python main.py
 
+Projekt stworzony przez: Adam Grejnia oraz Konrad Napieraj
