@@ -1,5 +1,7 @@
 Projekt gry Flappy Janusz - Studia/Obiektówka
 
+Prezentacja: https://www.youtube.com/watch?v=W4dkbs6Iic0&list=PLz9EJY2gVcETyeL6EizYEBFrBzZblmGp9
+
 Żeby odpalić tą gierke potrzebujecie zrobić klika rzeczy:
 
 # Wymagania:
