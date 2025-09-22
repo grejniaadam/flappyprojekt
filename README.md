@@ -27,28 +27,3 @@ Projekt gry Flappy Janusz - Studia/Obiektówka
    - Uruchamiamy ją z pomoca terminalu. Jeżeli macie aktywne środowisko 
      wpisujecie w terminalu: python main.py
 
-# --- Warto skonfigurować sobie gita i githuba --- # Tak, Git i GitHub to oddziele rzeczy
-
-Żeby git działało poprawnie i by wszystko było "legancko tego" potrzebujecie 
-ustawić te dane. 
-
-* Wykonujcię kolejno punkty.
-   - Ustawienie nazwy Użytkownika: git config --global user.name "Imię i Nazwisko"
-   - Ustawienie adresu e-mail: git config --global user.email "twój@email"
-   - Ustawienie domyślnej nazwy gałęzi: git config --global init.defaultBranch main
-
-* Obsługa Git'a w terminalu (podstawowe rzeczy):
-   - Pobranie repo: git clone "link"
-
-   - Dodanie repo (lokalnie): git add "nazwa_pliku" lub . wtedy doda wszystkie zmienione
-
-   - Dodanie commitu (opisu): git commit -m "Tutaj opis wprowadzonych zmian"
-
-   - Wypchnięcie repo na GitHub: git push
-
-   - Pobranie zmian od innych programistów: git pull
-
-   - Sprawdznie plików między nami a Gitem: git status
-
-
-
